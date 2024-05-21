@@ -1,6 +1,6 @@
 ### branch 전략
 1. 요구사항에 대한 issue 생성
-2. issue에 해당하는 branh 생성
+2. issue에 해당하는 branch 생성 (settings, docs 제외)
 3. main branch에 병합
 4. 병합 완료 후 branch 삭제
 
