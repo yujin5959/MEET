@@ -1,30 +1,16 @@
-# React + TypeScript + Vite
+### branch 전략
+1. 요구사항에 대한 issue 생성
+2. issue에 해당하는 branh 생성
+3. main branch에 병합
+4. 병합 완료 후 branch 삭제
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### branch naming rule
 
-Currently, two official plugins are available:
+{{label}}/#{{issue_NO}}
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ex)feat/#21 : issue 21번에 대한 branch
 
-## Expanding the ESLint configuration
+### PR RULE
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+* main branch에는 동작 가능한 코드만 merge 합니다.
+* code review 완료된 pr만 merge 합니다.
