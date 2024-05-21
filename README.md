@@ -1,3 +1,8 @@
+### API REFERENCE
+postman document 링크<br>
+
+https://documenter.getpostman.com/view/32874690/2sA3Qnhu7R
+
 ### branch 전략
 1. 요구사항에 대한 issue 생성
 2. issue에 해당하는 branch 생성 (settings, docs 제외)
