@@ -1,10 +1,10 @@
 // src/App.tsx
-import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import router from './utils/router';
-import React from 'react';
+import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import router from "./utils/router";
+import React from "react";
 import AuthInterceptor from "./utils/authInterceptor";
-import NotFound from './utils/notFound';
+import NotFound from "./utils/notFound";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
-        <Route path="*" element={<NotFound />} />  // 404 경로 추가
+        <Route path="*" element={<NotFound />} /> // 404 경로 추가
       </Routes>
     </BrowserRouter>
   );

@@ -14,8 +14,14 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md mx-4">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "#242424" }}
+    >
+      <div
+        className="p-8 rounded-lg shadow-md w-full max-w-md mx-4"
+        style={{ backgroundColor: "#3f3f3f" }}
+      >
         <h2 className="text-2xl font-bold mb-6 text-center text-white">
           로그인
         </h2>
@@ -82,7 +88,12 @@ export const KakaoCode = () => {
           );
           localStorage.setItem("refreshToken", response.data.refreshToken);
 
-          navigate("/");
+          // 사용자 권한 확인
+          if (response.data.isAuthorized) {
+            navigate("/");
+          } else {
+            navigate("/error");
+          }
         } catch (error) {
           console.error("Error fetching token:", error);
         }
