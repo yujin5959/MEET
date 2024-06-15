@@ -1,7 +1,5 @@
 ### API REFERENCE
-postman document 링크<br>
-
-https://documenter.getpostman.com/view/32874690/2sA3Qnhu7R
+http://54.180.29.36/api-reference
 
 ### branch 전략
 1. 요구사항에 대한 issue 생성
