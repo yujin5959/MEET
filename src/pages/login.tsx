@@ -8,7 +8,7 @@ const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
 
 export const Login = () => {
   // oauth 요청 URL
-  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code&scope=friends,account_email,profile_nickname,talk_message`;
   const handleLogin = () => {
     window.location.href = kakaoURL;
   };
@@ -54,6 +54,10 @@ export const KakaoCode = () => {
         params.append("client_id", rest_api_key);
         params.append("redirect_uri", redirect_uri);
         params.append("code", code);
+        params.append(
+          "scope",
+          "friends,account_email,profile_nickname,talk_message"
+        );
         params.append("client_secret", clientSecret);
 
         try {
@@ -78,7 +82,7 @@ export const KakaoCode = () => {
       const login = async () => {
         const url = "http://54.180.29.36/auth/login";
         const data = {
-          accessToken: "Bearer " + token,
+          accessToken: `Bearer ${token}`,
         };
         try {
           const response = (await axios.post(url, data)).data;
@@ -89,10 +93,19 @@ export const KakaoCode = () => {
           localStorage.setItem("refreshToken", response.data.refreshToken);
 
           // 사용자 권한 확인
-          if (response.data.isAuthorized) {
+          const privilegeUrl = "http://54.180.29.36/member/previllege";
+          const privilegeResponse = await axios.get(privilegeUrl, {
+            headers: {
+              Authorization: `Bearer ${response.data.accessToken}`,
+            },
+          });
+
+          const privilege = privilegeResponse.data.data.previllege;
+
+          if (privilege === "admin" || privilege === "accepted") {
             navigate("/");
           } else {
-            navigate("/error");
+            navigate("/Unauthorized");
           }
         } catch (error) {
           console.error("Error fetching token:", error);
@@ -101,7 +114,7 @@ export const KakaoCode = () => {
 
       login();
     }
-  }, [token]);
+  }, [token, navigate]);
 
   return <></>;
 };

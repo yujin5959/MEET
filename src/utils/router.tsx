@@ -20,8 +20,8 @@ const router: RouteObject[] = [
     element: <Pages.KakaoCode />,
   },
   {
-    path: "/error",
-    element: <Pages.Error />,
+    path: "/Unauthorized",
+    element: <Pages.Unauthorized />,
   },
 ];
 

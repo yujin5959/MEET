@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export const Error = () => {
+export const Unauthorized = () => {
+  const navigate = useNavigate();
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -20,10 +22,10 @@ export const Error = () => {
           접근 권한이 없습니다. 관리자에게 문의하세요.
         </p>
         <button
-          onClick={() => (window.location.href = "/")}
+          onClick={() => navigate("/auth/login")}
           className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
         >
-          홈으로 돌아가기
+          로그인으로 돌아가기
         </button>
       </div>
     </div>
