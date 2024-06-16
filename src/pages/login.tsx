@@ -8,14 +8,20 @@ const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
 
 export const Login = () => {
   // oauth 요청 URL
-  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code&scope=friends,account_email,profile_nickname,talk_message`;
   const handleLogin = () => {
     window.location.href = kakaoURL;
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md mx-4">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "#242424" }}
+    >
+      <div
+        className="p-8 rounded-lg shadow-md w-full max-w-md mx-4"
+        style={{ backgroundColor: "#3f3f3f" }}
+      >
         <h2 className="text-2xl font-bold mb-6 text-center text-white">
           로그인
         </h2>
@@ -48,6 +54,10 @@ export const KakaoCode = () => {
         params.append("client_id", rest_api_key);
         params.append("redirect_uri", redirect_uri);
         params.append("code", code);
+        params.append(
+          "scope",
+          "friends,account_email,profile_nickname,talk_message"
+        );
         params.append("client_secret", clientSecret);
 
         try {
@@ -72,7 +82,7 @@ export const KakaoCode = () => {
       const login = async () => {
         const url = "http://54.180.29.36/auth/login";
         const data = {
-          accessToken: "Bearer " + token,
+          accessToken: `Bearer ${token}`,
         };
         try {
           const response = (await axios.post(url, data)).data;
@@ -82,7 +92,21 @@ export const KakaoCode = () => {
           );
           localStorage.setItem("refreshToken", response.data.refreshToken);
 
-          navigate("/");
+          // 사용자 권한 확인
+          const privilegeUrl = "http://54.180.29.36/member/previllege";
+          const privilegeResponse = await axios.get(privilegeUrl, {
+            headers: {
+              Authorization: `Bearer ${response.data.accessToken}`,
+            },
+          });
+
+          const privilege = privilegeResponse.data.data.previllege;
+
+          if (privilege === "admin" || privilege === "accepted") {
+            navigate("/");
+          } else {
+            navigate("/Unauthorized");
+          }
         } catch (error) {
           console.error("Error fetching token:", error);
         }
@@ -90,7 +114,7 @@ export const KakaoCode = () => {
 
       login();
     }
-  }, [token]);
+  }, [token, navigate]);
 
   return <></>;
 };
