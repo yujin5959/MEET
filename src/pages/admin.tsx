@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import List from "@/components/list";
+import UserManage from "@/components/UserManage";
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  previllege: string;
+  uuid: string;
+};
 
 const Admin = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     fetchUserList();
@@ -35,6 +43,50 @@ const Admin = () => {
     }
   };
 
+  // 유저 권한 변경
+  const handlePermissionChange = async (
+    memberId: string,
+    currentPrivilege: string,
+    uuid: string
+  ) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      let newPrivilege =
+        currentPrivilege === "accept" || currentPrivilege === "admin"
+          ? "deny"
+          : "accept";
+      console.log(
+        `Changing privilege from ${currentPrivilege} to ${newPrivilege}`
+      );
+      const response = await axios.put(
+        "http://54.180.29.36/member/previllege",
+        {
+          memberId: memberId,
+          option: newPrivilege, // 새 권한을 서버로 전송
+          uuid: uuid,
+        },
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setUsers((prevState) =>
+          prevState.map((user) =>
+            user.id === memberId ? { ...user, previllege: newPrivilege } : user
+          )
+        );
+      } else if (response.status === 403) {
+        console.error("관리자 권한이 없습니다. 권한을 변경할 수 없습니다.");
+      } else if (response.status === 404) {
+        console.error("존재하지 않는 멤버입니다. 권한을 변경할 수 없습니다.");
+      }
+    } catch (error) {
+      console.error("유저 권한을 업데이트하는 중 오류가 발생했습니다:", error);
+    }
+  };
+
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -47,7 +99,15 @@ const Admin = () => {
         <h1 className="text-2xl font-bold mb-6 text-center text-white">
           User List
         </h1>
-        <List users={users} />
+        <ul className="max-w-full divide-y divide-gray-700">
+          {users.map((user) => (
+            <UserManage
+              key={user.id}
+              user={user}
+              handlePermissionChange={handlePermissionChange}
+            />
+          ))}
+        </ul>
       </div>
     </div>
   );
