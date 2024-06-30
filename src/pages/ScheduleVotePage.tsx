@@ -40,10 +40,10 @@ const ScheduleVotePage = () => {
         style={{ backgroundColor: "#3f3f3f" }}
       >
         <h1 className="text-2xl font-bold mb-4 text-center text-white">
-          {meetSchedule ? meetSchedule.meetTitle : ""}
+          {meetSchedule ? meetSchedule.meetTitle : "모임 제목"}
         </h1>
         <p className="text-center text-white mb-2">
-          {meetSchedule ? `마감 기한: ${meetSchedule.endDate}` : ""}
+          {meetSchedule ? `마감 기한: ${meetSchedule.endDate}` : "마감 기한"}
         </p>
         <div className="mt-4 p-2">
           {isVoted ? (
