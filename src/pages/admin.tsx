@@ -8,6 +8,7 @@ type User = {
   email: string;
   previllege: string;
   uuid: string;
+  isFirst: string;
 };
 
 const Admin = () => {
@@ -16,6 +17,37 @@ const Admin = () => {
   useEffect(() => {
     fetchUserList();
   }, []);
+
+  // UUID 가져오기
+  const fetchUUID = async () => {
+    try {
+      const token = await axios.get(
+        "http://54.180.29.36/auth/admin/accessToken",
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      console.log("accesstoken", token.data.data.adminAccessToken);
+      const response = await axios.get(
+        "https://kapi.kakao.com/v1/api/talk/friends",
+        {
+          headers: {
+            Authorization: `Bearer ${token.data.data.adminAccessToken}`,
+          },
+        }
+      );
+
+      console.log("카카오 API 응답:", response.data);
+      const friends = response.data.elements;
+      const uuids = friends.map((friend: { uuid: string }) => friend.uuid);
+      console.log("가져온 UUID 목록:", uuids);
+    } catch (error) {
+      console.error("UUID를 가져오는 중 오류가 발생했습니다:", error);
+      throw error;
+    }
+  };
 
   // 서버에서 유저 목록 가져오기
   const fetchUserList = async () => {
@@ -47,7 +79,8 @@ const Admin = () => {
   const handlePermissionChange = async (
     memberId: string,
     currentPrivilege: string,
-    uuid: string
+    uuid: string,
+    isFirst: string
   ) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -55,9 +88,14 @@ const Admin = () => {
         currentPrivilege === "accept" || currentPrivilege === "admin"
           ? "deny"
           : "accept";
-      console.log(
-        `Changing privilege from ${currentPrivilege} to ${newPrivilege}`
-      );
+
+      //uuid 기본값은 null
+      let uuid = null;
+      //만약에 isFirst가 true 면 값 대입하기
+      if (isFirst) {
+        uuid = await fetchUUID();
+      }
+
       const response = await axios.put(
         "http://54.180.29.36/member/previllege",
         {

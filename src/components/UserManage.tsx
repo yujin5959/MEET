@@ -8,7 +8,8 @@ const UserManage = ({
   handlePermissionChange: (
     memberId: string,
     currentPrivilege: string,
-    uuid: string
+    uuid: string,
+    isFirst: string
   ) => void;
 }) => {
   return (
@@ -23,7 +24,12 @@ const UserManage = ({
         </div>
         <button
           onClick={() =>
-            handlePermissionChange(user.id, user.previllege, user.uuid)
+            handlePermissionChange(
+              user.id,
+              user.previllege,
+              user.uuid,
+              user.isFirsts
+            )
           }
           className={`px-4 py-2 rounded-md bg-gray-400 text-white`}
         >
