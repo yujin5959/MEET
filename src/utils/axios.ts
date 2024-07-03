@@ -11,12 +11,12 @@ api.interceptors.request.use(
     if (config.url?.startsWith("/auth")) {
       return config;
     }
-    const refreshToken = sessionStorage.getItem("refreshToken");
-    if (!refreshToken) {
+    const accessToken = localStorage.getItem("accessToken");
+    console.log(accessToken);
+    if (!accessToken || accessToken === undefined) {
       window.location.href = "/auth/login";
     }
-
-    config.headers["Authorization"] = `Bearer ${refreshToken}`;
+    config.headers["Authorization"] = `${accessToken}`;
     return config;
   },
   function (error) {
@@ -27,11 +27,12 @@ api.interceptors.request.use(
 // 응답 인터셉터 추가
 api.interceptors.response.use(
   (response) => {
-    return response;
+    console.log(response);
+    return response.data;
   },
   async (error) => {
     // 401 오류 발생 시
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.code === "401") {
       // 로컬 스토리지에서 리프레시 토큰 가져오기
       const refreshToken = localStorage.getItem("refreshToken");
       // /auth/token/refresh 엔드포인트로 POST 요청 보내기
