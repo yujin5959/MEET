@@ -1,18 +1,21 @@
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 import axios from "axios";
+import ServerError from "@/utils/serverError";
 
 const api = axios.create({
-  baseURL: "http://54.180.29.36",
-});
+
+  baseURL: "http://54.180.29.36",}
+);
+
+const whiteList = ["/auth/login","/auth/token/refresh"]
 
 // 요청 인터셉터
 api.interceptors.request.use(
   function (config) {
-    if (config.url?.startsWith("/auth")) {
+    if (config.url != null && whiteList.includes(config.url)) {
       return config;
     }
     const accessToken = localStorage.getItem("accessToken");
-    console.log(accessToken);
     if (!accessToken || accessToken === undefined) {
       window.location.href = "/auth/login";
     }
@@ -27,12 +30,23 @@ api.interceptors.request.use(
 // 응답 인터셉터 추가
 api.interceptors.response.use(
   (response) => {
-    console.log(response);
-    return response.data;
+    console.log("[axiost.tsx.api] response : ",response.data)
+    if(response.data.code === "200"){
+      console.log("[axiost.tsx.api] success")
+      return response.data;
+    }
+
+    //200이 아니면 error로 취급
+    return Promise.reject(new ServerError(
+      response.data.message,
+      response.data.code,
+      response.data.data
+    ));
   },
   async (error) => {
+    console.log("[axiost.tsx.api] err : ",error.response.status)
     // 401 오류 발생 시
-    if (error.response && error.response.code === "401") {
+    if (error.response && error.response.status === 401) {
       // 로컬 스토리지에서 리프레시 토큰 가져오기
       const refreshToken = localStorage.getItem("refreshToken");
       // /auth/token/refresh 엔드포인트로 POST 요청 보내기
@@ -43,18 +57,20 @@ api.interceptors.response.use(
           },
         })
         .then((response) => {
+          console.log("[axiost.tsx.api.response.use.then] refresh : ",response.data)
           // 새 액세스 토큰 저장
-          localStorage.setItem("accessToken", response.data.accessToken);
-          // 새 리프레시 토큰 저장 (옵션)
+          localStorage.setItem("accessToken", response.data.grantType + " " + response.data.accessToken);
+          // 새 리프레시 토큰 저장
           localStorage.setItem("refreshToken", response.data.refreshToken);
 
           // 원래 요청 다시 시도
           error.config.headers[
             "Authorization"
           ] = `Bearer ${response.data.accessToken}`;
-          return axios(error.config);
+          return api(error.config);
         })
         .catch((refreshError) => {
+          console.log("[axiost.tsx.api] refresh : ",refreshError)
           // 리프레시 토큰 요청 실패 시 로그인 페이지로 리디렉션
           window.location.href = "/auth/login";
           return Promise.reject(refreshError);

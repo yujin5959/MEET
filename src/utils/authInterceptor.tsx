@@ -24,13 +24,13 @@ const AuthInterceptor: React.FC<AuthInterceptorProps> = ({ children }) => {
           const privilegeUrl = "http://54.180.29.36/member/previllege";
           const privilegeResponse = await axios.get(privilegeUrl, {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `${token}`,
             },
           });
           const privilege = privilegeResponse.data.data.previllege;
 
           if (privilege === "admin" || privilege === "accepted") {
-            navigate("/", { replace: true });
+            navigate(location.pathname, { replace: true });
           } else {
             navigate("/Unauthorized", { replace: true });
           }
@@ -42,7 +42,7 @@ const AuthInterceptor: React.FC<AuthInterceptorProps> = ({ children }) => {
 
       fetchPrivilege();
     }
-  }, [navigate, location]);
+  }, [navigate, location.pathname]);
 
   return <>{children || <Outlet />}</>;
 };
