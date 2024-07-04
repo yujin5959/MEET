@@ -4,62 +4,97 @@ import axios from "axios";
 import ScheduleVoteBefore from "@/components/ScheduleVoteBefore";
 import ScheduleVoteAfter from "@/components/ScheduleVoteAfter";
 
+type Schedule = {
+  id: string;
+  date: string;
+  userId: string;
+};
+
 type MeetSchedule = {
   meetTitle: string;
   endDate: string;
+  existingSchedules: Schedule[]; // 기존 일정 목록
+  votes: { [key: string]: number }; // 각 일정에 대한 투표 수
 };
 
 const ScheduleVotePage = () => {
   const { meetId } = useParams<{ meetId: string }>();
   const [meetSchedule, setMeetSchedule] = useState<MeetSchedule | null>(null);
   const [isVoted, setIsVoted] = useState<boolean>(false);
+  const currentUserId = "currentUserId";
 
   useEffect(() => {
+    const fetchMeetSchedule = async () => {
+      try {
+        const response = await axios.get(
+          `http://54.180.29.36/meet/schedule/${meetId}`
+        );
+        const { meetTitle, endDate, existingSchedules, votes } = response.data;
+        setMeetSchedule({ meetTitle, endDate, existingSchedules, votes });
+      } catch (error) {
+        console.error("Meet Schedule 가져오기 실패:", error);
+      }
+    };
+
     if (meetId) {
-      axios
-        .get(`http://54.180.29.36/meet/schedule/${meetId}`)
-        .then((response) => {
-          const { meetTitle, endDate } = response.data;
-          setMeetSchedule({ meetTitle, endDate });
-        })
-        .catch((error) => console.error("Meet Schedule 가져오기 실패:", error));
+      fetchMeetSchedule();
     }
   }, [meetId]);
 
-  const handleButtonClick = () => {
-    setIsVoted((prevIsVoted) => !prevIsVoted);
+  // 투표하기 버튼 눌렀을 때
+  const handleVoteClick = async (date: string) => {
+    try {
+      const response = await axios.post(
+        `http://54.180.29.36/meet/schedule/item`,
+        {
+          meetId,
+          date,
+          userId: currentUserId,
+        }
+      );
+      console.log("투표 추가 성공:", response.data);
+      setIsVoted(true);
+    } catch (error) {
+      console.error("투표 추가 실패:", error);
+    }
+  };
+
+  // 다시 투표하기 버튼 눌렀을 때
+  const handleVoteAgainClick = () => {
+    setIsVoted(false);
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center"
-      style={{ backgroundColor: "#242424" }}
-    >
-      <div
-        className=" p-6 rounded-lg shadow-lg max-w-md mx-4"
-        style={{ backgroundColor: "#3f3f3f" }}
-      >
-        <h1 className="text-2xl font-bold mb-4 text-center text-white">
+    <div className="bg-white p-8 md:p-8">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-lg font-bold">
           {meetSchedule ? meetSchedule.meetTitle : "모임 제목"}
         </h1>
-        <p className="text-center text-white mb-2">
+        <p className="text-sm">
           {meetSchedule ? `마감 기한: ${meetSchedule.endDate}` : "마감 기한"}
         </p>
-        <div className="mt-4 p-2">
-          {isVoted ? (
-            <ScheduleVoteBefore meetId={meetId!} />
-          ) : (
-            <ScheduleVoteAfter meetId={meetId!} />
-          )}
-        </div>
-        <div className="bottom-0 left-0 w-full pt-4 flex justify-center">
-          <button
-            onClick={handleButtonClick}
-            className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
-          >
-            {isVoted ? "투표 완료" : "다시 투표하기"}
-          </button>
-        </div>
+      </div>
+      <div className="p-4">
+        {isVoted ? (
+          <ScheduleVoteAfter
+            meetId={meetId!}
+            votes={meetSchedule ? meetSchedule.votes : {}} // 투표 수 데이터 전달
+            onVoteAgainClick={handleVoteAgainClick}
+            selectedSchedules={
+              meetSchedule ? meetSchedule.existingSchedules : []
+            } // 선택된 일정 목록 전달
+          />
+        ) : (
+          <ScheduleVoteBefore
+            meetId={meetId!}
+            existingSchedules={
+              meetSchedule ? meetSchedule.existingSchedules : []
+            } // 기존 일정 목록 전달
+            isVoted={isVoted}
+            onVoteClick={handleVoteClick}
+            currentUserId={currentUserId}
+          />
+        )}
       </div>
     </div>
   );
