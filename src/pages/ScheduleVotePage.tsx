@@ -1,98 +1,131 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import ScheduleVoteBefore from "@/components/ScheduleVoteBefore";
 import ScheduleVoteAfter from "@/components/ScheduleVoteAfter";
+import { server } from "@/utils/axios";
+import { Schedule } from "@/types/ScheduleVote";
 
-type Schedule = {
-  id: string;
-  date: string;
-  userId: string;
-};
-
-type MeetSchedule = {
+//모임
+type Meet = {
   meetTitle: string;
   endDate: string;
-  existingSchedules: Schedule[]; // 기존 일정 목록
-  votes: { [key: string]: number }; // 각 일정에 대한 투표 수
 };
 
 const ScheduleVotePage = () => {
+  const navigate = useNavigate();
+
   const { meetId } = useParams<{ meetId: string }>();
-  const [meetSchedule, setMeetSchedule] = useState<MeetSchedule | null>(null);
+  const [meet, setMeet] = useState<Meet>({ meetTitle: '', endDate: '' });
+  const [scheduleList, setScheduleList] = useState<Schedule[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
-  const currentUserId = "currentUserId";
 
   useEffect(() => {
     const fetchMeetSchedule = async () => {
-      try {
-        const response = await axios.get(
-          `http://54.180.29.36/meet/schedule/${meetId}`
-        );
-        const { meetTitle, endDate, existingSchedules, votes } = response.data;
-        setMeetSchedule({ meetTitle, endDate, existingSchedules, votes });
-      } catch (error) {
-        console.error("Meet Schedule 가져오기 실패:", error);
+      // load meet data
+      await fetchMeet();
+
+      //load schedule vote items
+      await fetchScheduleVoteItems();
+    }
+
+    fetchMeetSchedule();
+  }, [meetId, navigate]);
+
+  useEffect(() => {
+    const fetchIsVoted = async () => {
+      //투표한 기록이 있는지 확인
+      await checkUserVotedBefore()
+    }
+    fetchIsVoted();
+    
+  }, [meet, scheduleList]);
+
+  // load meet data
+  const fetchMeet = async() => {
+    server.get(
+      `/meet/schedule?meetId=${meetId}`
+    )
+    .then((response) => {
+      setMeet(response.data);
+    })
+    .catch((error) => {
+      if(error.code === "403"){
+        navigate("/Unauthorized");
       }
-    };
+      else if(error.code === "404"){
+        navigate("/not-found");
+      }
+    });
+  };
 
-    if (meetId) {
-      fetchMeetSchedule();
-    }
-  }, [meetId]);
+  //load schedule vote items
+  const fetchScheduleVoteItems = async() => {
+    server.get(
+      `/meet/schedule/item/list?meetId=${meetId}`
+    )
+    .then((response) => {
+      setScheduleList(response.data);
+    })
+    .catch((error) => {
+      if(error.code === "403"){
+        navigate("/Unauthorized");
+      }
+      else if(error.code === "404"){
+        navigate("/not-found");
+      }
+    });
+  };
 
-  // 투표하기 버튼 눌렀을 때
-  const handleVoteClick = async (date: string) => {
-    try {
-      const response = await axios.post(
-        `http://54.180.29.36/meet/schedule/item`,
-        {
-          meetId,
-          date,
-          userId: currentUserId,
+  // 투표한 기록이 있는지 확인하는 함수
+  const checkUserVotedBefore = async () => {
+    var loginedUserId;
+    await server.get("/member")
+      .then((response) => {
+        loginedUserId = response.data.id;
+      })
+      .catch((error) => {
+        if(error.code === "403"){
+          navigate("/Unauthorized");
         }
-      );
-      console.log("투표 추가 성공:", response.data);
-      setIsVoted(true);
-    } catch (error) {
-      console.error("투표 추가 실패:", error);
-    }
-  };
+        else if(error.code === "404"){
+          navigate("/auth/login");
+        }
+      });
 
-  // 다시 투표하기 버튼 눌렀을 때
-  const handleVoteAgainClick = () => {
-    setIsVoted(false);
-  };
+    for (const schedule of scheduleList) {
+      for (const member of schedule.memberList) {
+        if (member.id === loginedUserId) {
+          setIsVoted(true);
+          return;
+        }
+      }
+    }
+    return;
+  }
 
   return (
-    <div className="bg-white p-8 md:p-8">
+    <div className="bg-white p-8 md:p-8 h-full">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-lg font-bold">
-          {meetSchedule ? meetSchedule.meetTitle : "모임 제목"}
+          {meet ? meet.meetTitle : ""}
         </h1>
         <p className="text-sm">
-          {meetSchedule ? `마감 기한: ${meetSchedule.endDate}` : "마감 기한"}
+          {meet ? `마감 기한: ${meet.endDate}` : "마감 기한: "}
         </p>
       </div>
       <div className="p-4">
         {isVoted ? (
           <ScheduleVoteAfter
-            meetId={meetId!}
-            votes={meetSchedule ? meetSchedule.votes : {}} // 투표 수 데이터 전달
-            onVoteAgainClick={handleVoteAgainClick}
-            selectedSchedules={
-              meetSchedule ? meetSchedule.existingSchedules : []
-            } // 선택된 일정 목록 전달
+            scheduleList={scheduleList}
+            setIsVoted={setIsVoted}
+            fetchScheduleVoteItems={fetchScheduleVoteItems}
           />
         ) : (
           <ScheduleVoteBefore
             meetId={meetId!}
-            existingSchedules={
-              meetSchedule ? meetSchedule.existingSchedules : []
-            } // 기존 일정 목록 전달
-            isVoted={isVoted}
-            onVoteClick={handleVoteClick}
-            currentUserId={currentUserId}
+            scheduleList={scheduleList}
+            setIsVoted={setIsVoted}
+            fetchScheduleVoteItems={fetchScheduleVoteItems}
           />
         )}
       </div>

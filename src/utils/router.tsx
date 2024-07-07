@@ -24,7 +24,11 @@ const router: RouteObject[] = [
     element: <Pages.Unauthorized />,
   },
   {
-    path: "/meet/schedule",
+    path: "/not-found",
+    element: <Pages.NotFound />,
+  },
+  {
+    path: "/meet/schedule/:meetId",
     element: <Pages.ScheduleVotePage />,
   },
 ];

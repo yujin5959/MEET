@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import router from "./utils/router";
 import React from "react";
 import AuthInterceptor from "./utils/authInterceptor";
-import NotFound from "./pages/Exceptions/notFound";
+import {NotFound} from "./pages/Exceptions/notFound";
 
 function App() {
   return (
