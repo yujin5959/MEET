@@ -23,6 +23,14 @@ const router: RouteObject[] = [
     path: "/Unauthorized",
     element: <Pages.Unauthorized />,
   },
+  {
+    path: "/meet/schedule",
+    element: <Pages.ScheduleVotePage />,
+  },
+  {
+    path: "/meet",
+    element: <Pages.MeetDetail />,
+  },
 ];
 
 export default router;
