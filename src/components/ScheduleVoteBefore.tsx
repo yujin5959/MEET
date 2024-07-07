@@ -19,12 +19,7 @@ const ScheduleVoteBefore = ({
   const [newDate, setNewDate] = useState<string>(""); // 새로 추가할 모임 일정의 상태 관리
   const [isAdding, setIsAdding] = useState<boolean>(false); // 새로운 모임 일정 추가 중인지 여부 관리
   const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
-  const [selectedSchedules, setSelectedSchedules] = useState<boolean[]>(
-    scheduleList.map(() => false)
-  ); // 선택된 모임 일정 체크 여부 관리하는 배열
-  const [isVoteEnabled, setIsVoteEnabled] = useState<boolean>(false); // 투표 버튼 활성화 여부 관리
-  const [isComposing, setIsComposing] = useState(false);
-
+  
   const navigate = useNavigate();
 
   console.log(scheduleList);
@@ -92,24 +87,19 @@ const ScheduleVoteBefore = ({
   };
   // 체크박스 상태 변경할 때
   const handleCheckboxChange = (id: string, checked: boolean) => {
-    setSelectedSchedules((prevSelectedSchedules) => {
-      const newSelectedSchedules = [...prevSelectedSchedules];
-
-      // Update selectedItemIdList
-      if (checked) {
-        if (!selectedItemIdList.includes(id)) {
-          setSelectedItemIdList((prevList) => [...prevList, id]);
-        }
-      } else {
-        if (selectedItemIdList.includes(id)) {
-          setSelectedItemIdList((prevList) =>
-            prevList.filter((itemId) => itemId !== id)
-          );
-        }
+    // Update selectedItemIdList
+    if (checked) {
+      if (!selectedItemIdList.includes(id)) {
+        setSelectedItemIdList((prevList) => [...prevList, id]);
       }
+    } else {
+      if (selectedItemIdList.includes(id)) {
+        setSelectedItemIdList((prevList) =>
+          prevList.filter((itemId) => itemId !== id)
+        );
+      }
+    }
 
-      return newSelectedSchedules;
-    });
   };
 
   // 투표하기 버튼 클릭할 때
