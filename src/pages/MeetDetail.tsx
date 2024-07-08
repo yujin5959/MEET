@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+type MeetInfo = {
+  title: string;
+  content: string;
+  type: string;
+  date: string;
+  place: string;
+  participantsNum: string;
+  participants: string[];
+};
+
 const MeetDetail: React.FC = () => {
   const { meetId } = useParams<{ meetId: string }>();
 
-  const [meetInfo, setMeetInfo] = useState<any>({
+  const [meetInfo, setMeetInfo] = useState<MeetInfo>({
     title: "",
     content: "",
     type: "",
@@ -26,7 +36,7 @@ const MeetDetail: React.FC = () => {
     };
 
     fetchMeetDetail();
-  }, []);
+  }, [meetId]);
 
   return (
     <div className="flex flex-col items-start m-8 space-y-4">
