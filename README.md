@@ -17,6 +17,8 @@ ex)feat/#21 : issue 21번에 대한 branch
 
 * main branch에는 동작 가능한 코드만 merge 합니다.
 * code review 완료된 pr만 merge 합니다.
+* PR 머지 후에 자동으로 issue가 닫히도록 설정합니다.
+  * Closes #issue No
 
 * pr ground rule
   1. pr 생성
