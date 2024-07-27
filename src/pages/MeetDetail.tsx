@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+type MeetInfo = {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  date: string;
+  place: string;
+  participantsNum: string;
+  participants: string[];
+};
+
+const meetData: MeetInfo = {
+  id: "1",
+  title: "2024 3분기 정기모임",
+  content: "정기 모임 입니다.",
+  type: "Routine",
+  date: "2024-07-05",
+  place: "강남역",
+  participantsNum: "2",
+  participants: ["김지훈", "장지연"],
+};
+
 const MeetDetail: React.FC = () => {
   const { meetId } = useParams<{ meetId: string }>();
 
-  const [meetInfo, setMeetInfo] = useState<any>({
-    title: "",
-    content: "",
-    type: "",
-    date: "",
-    place: "",
-    participantsNum: "",
-    participants: [],
-  });
+  const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
 
   useEffect(() => {
-    const fetchMeetDetail = async () => {
-      try {
-        // const response = await fetch(`http://54.180.29.36/meet/${meetId}`);
-        // const data = await response.json();
-        // setMeetInfo(data);
-      } catch (error) {
-        console.error("모임 상세 정보를 가져오는 중 오류 발생:", error);
-      }
-    };
+    if (meetId === meetData.id) {
+      setMeetInfo(meetData);
+    }
+  }, [meetId]);
 
-    fetchMeetDetail();
-  }, []);
+  if (!meetInfo) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col items-start m-8 space-y-4">
