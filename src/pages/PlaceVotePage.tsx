@@ -2,26 +2,11 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import PlaceVoteBefore from "@/components/PlaceVoteBefore";
 import PlaceVoteAfter from "@/components/PlaceVoteAfter";
-
-// 모임 정보 타입 정의
-type Meet = {
-  meetTitle: string;
-  meetDate: string;
-  endDate: string;
-};
-
-// 장소 정보 타입 정의
-type Place = {
-  id: string;
-  place: string;
-  editable: string;
-  isVote: string;
-  memberList: { id: string; name: string }[];
-};
+import { PlaceMeet, Place } from "@/types/PlaceVote";
 
 const PlaceVotePage = () => {
   const { meetId } = useParams<{ meetId: string }>();
-  const [meet, setMeet] = useState<Meet>({
+  const [meet, setMeet] = useState<PlaceMeet>({
     meetTitle: "",
     meetDate: "2024-07-30",
     endDate: "2024-07-16",

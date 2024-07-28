@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-
-// 장소 정보 타입 정의
-type Place = {
-  id: string;
-  place: string;
-  editable: string;
-  isVote: string;
-  memberList: { id: string; name: string }[];
-};
+import { Place } from "@/types/PlaceVote";
 
 // 컴포넌트 props 타입 정의
 type PlaceVoteBeforeProps = {

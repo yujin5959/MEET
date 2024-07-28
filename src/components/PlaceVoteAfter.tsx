@@ -1,13 +1,5 @@
 import React from "react";
-
-// 장소 정보 타입 정의
-type Place = {
-  id: string;
-  place: string;
-  editable: string;
-  isVote: string;
-  memberList: { id: string; name: string }[];
-};
+import { Place } from "@/types/PlaceVote";
 
 // 컴포넌트 props 타입 정의
 type PlaceVoteAfterProps = {
@@ -34,11 +26,7 @@ const PlaceVoteAfter = ({
           className="flex items-center justify-between p-2 rounded-lg bg-gray-200"
         >
           <span>{place.place}</span>
-          <span className="ml-4">
-            {votedPlaces.some((votedPlace) => votedPlace.id === place.id)
-              ? "투표 완료"
-              : ""}
-          </span>
+          <span className="ml-4">투표 수: {place.memberList.length}</span>
         </div>
       ))}
       <button

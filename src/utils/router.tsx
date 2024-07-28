@@ -36,7 +36,7 @@ const router: RouteObject[] = [
     element: <Pages.MeetDetail />,
   },
   {
-    path: "meet/place",
+    path: "meet/place/:meetId",
     element: <Pages.PlaceVotePage />,
   },
 ];
