@@ -16,23 +16,24 @@ const PlaceVotePage = () => {
   const [placeList, setPlaceList] = useState<Place[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
 
-  // 컴포넌트가 처음 마운트될 때 모임 정보와 장소 목록을 가져옴
+  // 페이지에 처음 로드될 때
   useEffect(() => {
-    const fetchMeetPlace = async () => {
-      await fetchMeet(); // 모임정보
-      await fetchPlaceVoteItems(); // 장소목록
+    const fetchData = async () => {
+      if (meetId) {
+        await fetchMeet(); // 모임 정보
+        await fetchPlaceVoteItems(); // 장소 목록
+        await checkUserVotedBefore(); // 사용자가 이미 투표했는지 확인
+      }
     };
+    fetchData();
+  }, [meetId]); 
 
-    fetchMeetPlace();
-  }, [meetId, navigate]);
-
-  // 장소 목록이 변경될 때 사용자가 이미 투표했는지 확인
+  // isVoted가 변경될 때
   useEffect(() => {
-    const fetchIsVoted = async () => {
-      await checkUserVotedBefore();
-    };
-    fetchIsVoted();
-  }, [meet, placeList]);
+    if (isVoted) {
+      fetchPlaceVoteItems();
+    }
+  }, [isVoted]);
 
   // 모임 정보 조회
   const fetchMeet = async () => {
