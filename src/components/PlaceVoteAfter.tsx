@@ -1,27 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Place } from "@/types/PlaceVote";
 
 // 컴포넌트 props 타입 정의
 type PlaceVoteAfterProps = {
   placeList: Place[];
-  setIsVoted: (value: boolean) => void;
-  fetchPlaceVoteItems: () => Promise<void>;
+  onVoteAgain: () => void;
 };
 
 const PlaceVoteAfter = ({
   placeList,
-  setIsVoted,
-  fetchPlaceVoteItems,
+  onVoteAgain
 }: PlaceVoteAfterProps) => {
-  // 컴포넌트가 처음 마운트될 때 장소 투표 항목을 가져옴
-  useEffect(() => {
-    fetchPlaceVoteItems();
-  }, []);
+  const [mostVotedPlaceIds, setMostVotedPlaceIds] = useState<string[]>([]);
 
-  var mostVotedPlaceIds: string[] = [];
+ // 컴포넌트가 처음 마운트될 때와 placeList가 변경될 때 실행
+  useEffect(() => {
+    setMostVotedPlaceIds(findTopPlaceIds(placeList)); // 가장 많이 투표된 장소 id 업데이트
+  }, [placeList]);
 
   // 가장 많은 투표를 받은 장소를 찾는 함수
-  const findPlacesWithLongestMemberList = (places: Place[]): string[] => {
+  const findTopPlaceIds = (places: Place[]): string[] => {
     if (places.length === 0) return [];
 
     const maxLength = places.reduce((max, place) => {
@@ -33,28 +31,23 @@ const PlaceVoteAfter = ({
       .map((place) => place.id);
   };
 
-  // 다시 투표하기 버튼 클릭 시 호출되는 함수
-  const handleVoteClick = () => {
-    setIsVoted(false); // PlaceVoteBefore로 돌아감
-  };
-
-  mostVotedPlaceIds = findPlacesWithLongestMemberList(placeList);
-
   return (
-    <div className="space-y-4">
-      {placeList.map((place) => (
+    <div className="space-y-4 flex flex-col h-full">
+      <div className="overflow-y-auto flex-grow" style={{ maxHeight: "60vh" }}>
+        {placeList.map((place) => (
         <div
           key={place.id}
-          className={`flex items-center justify-between p-2 ${
+          className={`flex items-center justify-between p-2 my-2 ${
             mostVotedPlaceIds.includes(place.id) ? "bg-yellow-200" : ""
           } rounded-lg`}
         >
           <span>{place.place}</span>
           <span className="ml-4">투표 수: {place.memberList.length}</span>
         </div>
-      ))}
+        ))}
+      </div>
       <button
-        onClick={handleVoteClick}
+        onClick={onVoteAgain}
         className="bg-gray-200 rounded-lg px-4 py-2 text-black w-full"
       >
         다시 투표하기

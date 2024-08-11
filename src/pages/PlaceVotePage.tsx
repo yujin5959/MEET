@@ -16,17 +16,17 @@ const PlaceVotePage = () => {
   const [placeList, setPlaceList] = useState<Place[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
 
-  // 컴포넌트가 처음 마운트될 때 모임과 장소 목록을 가져오는 함수 호출
+  // 컴포넌트가 처음 마운트될 때 모임 정보와 장소 목록을 가져옴
   useEffect(() => {
     const fetchMeetPlace = async () => {
-      await fetchMeet();
-      await fetchPlaceVoteItems();
+      await fetchMeet(); // 모임정보
+      await fetchPlaceVoteItems(); // 장소목록
     };
 
     fetchMeetPlace();
   }, [meetId, navigate]);
 
-  // 장소 목록이 변경될 때 사용자가 이미 투표했는지 확인하는 함수 호출
+  // 장소 목록이 변경될 때 사용자가 이미 투표했는지 확인
   useEffect(() => {
     const fetchIsVoted = async () => {
       await checkUserVotedBefore();
@@ -55,7 +55,6 @@ const PlaceVotePage = () => {
     server
       .get(`/meet/place/item/list?meetId=${meetId}`)
       .then((response) => {
-        console.log("Fetched place vote items:", response.data);
         setPlaceList(response.data);
       })
       .catch((error) => {
@@ -95,8 +94,9 @@ const PlaceVotePage = () => {
     return;
   };
 
-  const updatePlaceList = (newPlaceList: Place[]) => {
-    setPlaceList(newPlaceList);
+  // 투표를 다시 할 수 있도록 상태를 업데이트하는 함수
+  const handleVoteAgain = () => {
+    setIsVoted(false);
   };
 
   return (
@@ -105,15 +105,14 @@ const PlaceVotePage = () => {
         <h1 className="text-lg font-bold">{meet.meetTitle}</h1>
         <div>
           <p className="text-sm">모임 날짜: {meet.meetDate}</p>
-          <p className="text-sm">투표 마감: {meet.endDate.replace("T", " ")}</p>
+          <p className="text-sm">투표 마감: {meet.endDate}</p>
         </div>
       </div>
       <div className="p-4">
         {isVoted ? (
           <PlaceVoteAfter
             placeList={placeList}
-            setIsVoted={setIsVoted}
-            fetchPlaceVoteItems={fetchPlaceVoteItems}
+            onVoteAgain={handleVoteAgain}
           />
         ) : (
           <PlaceVoteBefore

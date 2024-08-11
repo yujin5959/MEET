@@ -7,8 +7,8 @@ import { Place } from "@/types/PlaceVote";
 type PlaceVoteBeforeProps = {
   meetId: string;
   placeList: Place[];
-  setIsVoted: (value: boolean) => void;
-  fetchPlaceVoteItems: () => Promise<void>;
+  setIsVoted: (value: boolean) => void; // 투표 여부 상태 업데이트 함수
+  fetchPlaceVoteItems: () => Promise<void>; // 장소 목록을 새로 가져오는 함수
 };
 
 const PlaceVoteBefore = ({
@@ -21,8 +21,12 @@ const PlaceVoteBefore = ({
   const [newPlace, setNewPlace] = useState<string>(""); // 새로 추가할 모임 장소의 상태 관리
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
-
   const navigate = useNavigate();
+
+  // 컴포넌트 마운트 시 초기 장소 목록 설정
+  useEffect(() => {
+    setPlaces(placeList);
+  }, [placeList]);
 
   // 장소가 변경될 때 선택된 장소 목록을 업데이트
   useEffect(() => {
@@ -39,7 +43,6 @@ const PlaceVoteBefore = ({
 
   // 새로운 장소 추가
   const handleAddPlace = async () => {
-    console.log("Sending data to server:", { meetId, place: newPlace });
     server
       .post(`/meet/place/item`, {
         data: {
@@ -48,7 +51,7 @@ const PlaceVoteBefore = ({
         },
       })
       .then((response) => {
-        const newPlace: Place = {
+        const newPlaceItem: Place = {
           id: response.data.id,
           place: response.data.place,
           editable: response.data.editable,
@@ -56,9 +59,9 @@ const PlaceVoteBefore = ({
           memberList: response.data.memberList,
         };
 
-        setPlaces((prevPlaces) => [...prevPlaces, newPlace]);
-        setNewPlace(""); // 입력 필드 초기화
-        setIsAdding(false); // 장소 추가 입력창 숨기기
+        setPlaces((prevPlaces) => [...prevPlaces, newPlaceItem]);
+        setNewPlace(""); 
+        setIsAdding(false); 
       })
       .catch((error) => {
         if (error.code === "403") {
@@ -73,7 +76,7 @@ const PlaceVoteBefore = ({
   const handleRemovePlace = (id: string) => {
     server
       .delete(`/meet/place/item?placeVoteItemId=${id}`)
-      .then((response) => {
+      .then(() => {
         setPlaces((prevList) => prevList.filter((place) => place.id !== id));
       })
       .catch((error) => {
@@ -89,13 +92,13 @@ const PlaceVoteBefore = ({
   const handleCheckboxChange = (id: string, checked: boolean) => {
     if (checked) {
       if (!selectedItemIdList.includes(id)) {
-        setSelectedItemIdList((prevList) => [...prevList, id]);
+        setSelectedItemIdList((prevList) => [...prevList, id]); // 선택된 항목 목록에 추가
       }
     } else {
       if (selectedItemIdList.includes(id)) {
         setSelectedItemIdList((prevList) =>
-          prevList.filter((itemId) => itemId !== id)
-        ); // 선택된 항목 목록에서 제거
+          prevList.filter((itemId) => itemId !== id) // 선택된 항목 목록에서 제거
+        ); 
       }
     }
   };
@@ -109,7 +112,8 @@ const PlaceVoteBefore = ({
           placeVoteItemList: selectedItemIdList,
         },
       })
-      .then((response) => {
+      .then(async () => {
+        await fetchPlaceVoteItems();
         setIsVoted(true);
       })
       .catch((error) => {
@@ -122,16 +126,17 @@ const PlaceVoteBefore = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col h-full">
+      <div className="overflow-y-auto flex-grow" style={{ maxHeight: "60vh" }}>
       {places.map((place) => (
-        <div key={place.id} className="flex items-center justify-between">
+        <div key={place.id} className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={selectedItemIdList.includes(place.id)}
               onChange={(e) => handleCheckboxChange(place.id, e.target.checked)}
             />
-            <span>{place.place}</span>
+            <span>{place.place}</span> 
           </div>
           {place.editable === "true" && (
             <button
@@ -143,6 +148,7 @@ const PlaceVoteBefore = ({
           )}
         </div>
       ))}
+      </div>
       <div className="flex justify-end">
         {!isAdding ? (
           <button
