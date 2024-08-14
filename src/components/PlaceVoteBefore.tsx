@@ -112,8 +112,7 @@ const PlaceVoteBefore = ({
           placeVoteItemList: selectedItemIdList,
         },
       })
-      .then(async () => {
-        await fetchPlaceVoteItems();
+      .then(() => {
         setIsVoted(true);
       })
       .catch((error) => {

@@ -30,9 +30,12 @@ const PlaceVotePage = () => {
 
   // isVoted가 변경될 때
   useEffect(() => {
-    if (isVoted) {
-      fetchPlaceVoteItems();
-    }
+    const updatePlaceVoteItems = async () => {
+      if (isVoted) {
+        fetchPlaceVoteItems();
+      }
+    };
+    updatePlaceVoteItems();
   }, [isVoted]);
 
   // 모임 정보 조회
