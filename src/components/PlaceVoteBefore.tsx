@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { server } from "@/utils/axios";
 import { Place } from "@/types/PlaceVote";
 
 // 컴포넌트 props 타입 정의
 type PlaceVoteBeforeProps = {
   meetId: string;
   placeList: Place[];
-  setIsVoted: (value: boolean) => void;
-  setVotedPlaces: (places: Place[]) => void;
-  updatePlaceList: (places: Place[]) => void;
+  setIsVoted: (value: boolean) => void; // 투표 여부 상태 업데이트 함수
+  fetchPlaceVoteItems: () => Promise<void>; // 장소 목록을 새로 가져오는 함수
 };
 
 const PlaceVoteBefore = ({
   meetId,
   placeList,
   setIsVoted,
-  setVotedPlaces,
-  updatePlaceList,
+  fetchPlaceVoteItems,
 }: PlaceVoteBeforeProps) => {
   const [places, setPlaces] = useState<Place[]>(placeList);
-  const [newPlace, setNewPlace] = useState<string>("");
+  const [newPlace, setNewPlace] = useState<string>(""); // 새로 추가할 모임 장소의 상태 관리
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
+  const navigate = useNavigate();
 
-  // 초기 선택된 장소 선택
+  // 컴포넌트 마운트 시 초기 장소 목록 설정
+  useEffect(() => {
+    setPlaces(placeList);
+  }, [placeList]);
+
+  // 장소가 변경될 때 선택된 장소 목록을 업데이트
   useEffect(() => {
     const updatedSelectedItemIdList = places
       .filter((place) => place.isVote === "true")
@@ -30,66 +36,106 @@ const PlaceVoteBefore = ({
     setSelectedItemIdList(updatedSelectedItemIdList);
   }, [places]);
 
-  // 새로운 장소 추가
-  const handleAddPlace = () => {
-    const newPlaceItem: Place = {
-      id: Math.random().toString(36).substring(2), // 임시 ID 생성
-      place: newPlace,
-      editable: "true",
-      isVote: "false",
-      memberList: [],
-    };
+  // 장소 입력 상태 관리 함수
+  const handlePlaceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPlace(event.target.value);
+  };
 
-    const updatedPlaces = [...places, newPlaceItem];
-    setPlaces(updatedPlaces);
-    updatePlaceList(updatedPlaces);
-    setNewPlace("");
-    setIsAdding(false);
+  // 새로운 장소 추가
+  const handleAddPlace = async () => {
+    server
+      .post(`/meet/place/item`, {
+        data: {
+          meetId: meetId,
+          place: newPlace,
+        },
+      })
+      .then((response) => {
+        const newPlaceItem: Place = {
+          id: response.data.id,
+          place: response.data.place,
+          editable: response.data.editable,
+          isVote: response.data.isVote,
+          memberList: response.data.memberList,
+        };
+
+        setPlaces((prevPlaces) => [...prevPlaces, newPlaceItem]);
+        setNewPlace(""); 
+        setIsAdding(false); 
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
   };
 
   // 장소 삭제
   const handleRemovePlace = (id: string) => {
-    const updatedPlaces = places.filter((place) => place.id !== id);
-    setPlaces(updatedPlaces);
-    updatePlaceList(updatedPlaces);
+    server
+      .delete(`/meet/place/item?placeVoteItemId=${id}`)
+      .then(() => {
+        setPlaces((prevList) => prevList.filter((place) => place.id !== id));
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
   };
 
   // 체크박스 변경
   const handleCheckboxChange = (id: string, checked: boolean) => {
     if (checked) {
-      setSelectedItemIdList((prevList) => [...prevList, id]);
+      if (!selectedItemIdList.includes(id)) {
+        setSelectedItemIdList((prevList) => [...prevList, id]); // 선택된 항목 목록에 추가
+      }
     } else {
-      setSelectedItemIdList((prevList) =>
-        prevList.filter((itemId) => itemId !== id)
-      );
+      if (selectedItemIdList.includes(id)) {
+        setSelectedItemIdList((prevList) =>
+          prevList.filter((itemId) => itemId !== id) // 선택된 항목 목록에서 제거
+        ); 
+      }
     }
   };
 
   // 투표하기 버튼 클릭할 때
-  const handleVoteClick = () => {
-    const votedPlaces = places.filter((place) =>
-      selectedItemIdList.includes(place.id)
-    );
-    setVotedPlaces(votedPlaces);
-    setIsVoted(true);
+  const handleVoteClick = async () => {
+    server
+      .put("/meet/place", {
+        data: {
+          meetId: meetId,
+          placeVoteItemList: selectedItemIdList,
+        },
+      })
+      .then(() => {
+        setIsVoted(true);
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col h-full">
+      <div className="overflow-y-auto flex-grow" style={{ maxHeight: "60vh" }}>
       {places.map((place) => (
-        <div key={place.id} className="flex items-center justify-between">
+        <div key={place.id} className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={selectedItemIdList.includes(place.id)}
-              onChange={() =>
-                handleCheckboxChange(
-                  place.id,
-                  !selectedItemIdList.includes(place.id)
-                )
-              }
+              onChange={(e) => handleCheckboxChange(place.id, e.target.checked)}
             />
-            <span>{place.place}</span>
+            <span>{place.place}</span> 
           </div>
           {place.editable === "true" && (
             <button
@@ -101,6 +147,7 @@ const PlaceVoteBefore = ({
           )}
         </div>
       ))}
+      </div>
       <div className="flex justify-end">
         {!isAdding ? (
           <button
@@ -115,7 +162,7 @@ const PlaceVoteBefore = ({
               type="text"
               placeholder="장소"
               value={newPlace}
-              onChange={(e) => setNewPlace(e.target.value)}
+              onChange={handlePlaceChange}
               className="border border-gray-300 rounded-lg px-2 py-1 w-full"
             />
 
