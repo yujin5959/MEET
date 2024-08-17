@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { server } from "@/utils/axios";
 
 const rest_api_key = import.meta.env.VITE_REST_API_KEY; //REST API KEY
 const redirect_uri = "http://localhost:5173/auth/kakao/redirect"; //Redirect URI
@@ -79,40 +80,33 @@ export const KakaoCode = () => {
   useEffect(() => {
     if (token) {
       console.log("trying to connect backend server...");
-      const login = async () => {
-        const url = "http://54.180.29.36/auth/login";
-        const data = {
+      server.post("/auth/login", {
+        data: {
           accessToken: `Bearer ${token}`,
-        };
-        try {
-          const response = (await axios.post(url, data)).data;
-          localStorage.setItem(
-            "accessToken",
-            response.data.grantType + " " + response.data.accessToken
-          );
-          localStorage.setItem("refreshToken", response.data.refreshToken);
+        },
+      })
+      .then((response) => {
+        localStorage.setItem(
+          "accessToken",
+          response.data.grantType + " " + response.data.accessToken
+        );
+        localStorage.setItem("refreshToken", response.data.refreshToken);
 
-          // 사용자 권한 확인
-          const privilegeUrl = "http://54.180.29.36/member/previllege";
-          const privilegeResponse = await axios.get(privilegeUrl, {
-            headers: {
-              Authorization: `Bearer ${response.data.accessToken}`,
-            },
-          });
-
-          const privilege = privilegeResponse.data.data.previllege;
+        // 사용자 권한 확인
+        return server.get("/member/previllege");
+      })
+      .then((privilegeResponse) => {
+        const privilege = privilegeResponse.data.previllege;
 
           if (privilege === "admin" || privilege === "accepted") {
             navigate("/");
           } else {
             navigate("/Unauthorized");
           }
-        } catch (error) {
-          console.error("Error fetching token:", error);
-        }
-      };
-
-      login();
+      })
+      .catch ((error) => {
+            console.error("Error fetching token:", error);
+      });
     }
   }, [token, navigate]);
 
