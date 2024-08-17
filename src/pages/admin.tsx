@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import UserManage from "@/components/UserManage";
+import { server } from "@/utils/axios";
 
 type User = {
   id: string;
@@ -19,30 +19,26 @@ const Admin = () => {
   }, []);
 
   // UUID 가져오기
-  const fetchUUID = async () => {
+  const fetchUUID = async ():Promise<string[]> => {
     try {
-      const token = await axios.get(
-        "http://54.180.29.36/auth/admin/accessToken",
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      console.log("accesstoken", token.data.data.adminAccessToken);
-      const response = await axios.get(
+      const token = await server.get(
+        "/auth/admin/accessToken");
+      console.log("accesstoken", token.adminAccessToken);
+      const response = await server.get(
         "https://kapi.kakao.com/v1/api/talk/friends",
         {
           headers: {
-            Authorization: `Bearer ${token.data.data.adminAccessToken}`,
+            Authorization: `Bearer ${token.adminAccessToken}`,
           },
         }
       );
 
       console.log("카카오 API 응답:", response.data);
-      const friends = response.data.elements;
+      const friends = response.elements;
       const uuids = friends.map((friend: { uuid: string }) => friend.uuid);
       console.log("가져온 UUID 목록:", uuids);
+      
+      return uuids;
     } catch (error) {
       console.error("UUID를 가져오는 중 오류가 발생했습니다:", error);
       throw error;
@@ -51,77 +47,65 @@ const Admin = () => {
 
   // 서버에서 유저 목록 가져오기
   const fetchUserList = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        throw new Error("로그인이 필요합니다.");
-      }
-      const response = await axios.get("http://54.180.29.36/member/list", {
-        headers: {
-          Authorization: `${token}`,
-        },
-      });
-      const transformedUsers = response.data.data.map((user: any) => {
-        if (user.previllege === "accepted") {
-          user.previllege = "accept";
-        } else if (user.previllege === "denied") {
-          user.previllege = "deny";
+    server
+      .get("/member/list")
+      .then((response) => {
+        if (response && response.data && Array.isArray(response.data)) {
+          const transformedUsers = response.data.map((user: any) => {
+            if (user.previllege === "accepted") {
+              user.previllege = "accept";
+            } else if (user.previllege === "denied") {
+              user.previllege = "deny";
+            }
+            return user;
+          });
+          setUsers(transformedUsers);
+        } else {
+          console.error("예상치 못한 응답 구조:", response);
         }
-        return user;
-      });
-      setUsers(transformedUsers);
-    } catch (error) {
+      })
+      .catch ((error) => {
       console.error("유저 목록을 불러오는 중 오류가 발생했습니다:", error);
-    }
+    });
   };
 
   // 유저 권한 변경
-  const handlePermissionChange = async (
+  const handlePermissionChange = (
     memberId: string,
     currentPrivilege: string,
     uuid: string,
     isFirst: string
   ) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      let newPrivilege =
-        currentPrivilege === "accept" || currentPrivilege === "admin"
-          ? "deny"
-          : "accept";
+    const newPrivilege = currentPrivilege === "accept" || currentPrivilege === "admin" ? "deny" : "accept";
+    
+    const updatePrivilege = (fetchedUUID: string | null) => {
+      const requestData = {
+        memberId,
+        option: newPrivilege,
+        uuid: fetchedUUID,
+      };
 
-      //uuid 기본값은 null
-      let uuid = null;
-      //만약에 isFirst가 true 면 값 대입하기
-      if (isFirst) {
-        uuid = await fetchUUID();
-      }
+      server
+        .put("/member/previllege", { data: requestData })
+        .then(() => {
+          setUsers((prevState) =>
+            prevState.map((user) =>
+              user.id === memberId ? { ...user, previllege: newPrivilege } : user
+            )
+          );
+        })
+        .catch((error) => {
+          console.error("유저 권한을 업데이트하는 중 오류가 발생했습니다:", error);
+        });
+    };
 
-      const response = await axios.put(
-        "http://54.180.29.36/member/previllege",
-        {
-          memberId: memberId,
-          option: newPrivilege, // 새 권한을 서버로 전송
-          uuid: uuid,
-        },
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setUsers((prevState) =>
-          prevState.map((user) =>
-            user.id === memberId ? { ...user, previllege: newPrivilege } : user
-          )
-        );
-      } else if (response.status === 403) {
-        console.error("관리자 권한이 없습니다. 권한을 변경할 수 없습니다.");
-      } else if (response.status === 404) {
-        console.error("존재하지 않는 멤버입니다. 권한을 변경할 수 없습니다.");
-      }
-    } catch (error) {
-      console.error("유저 권한을 업데이트하는 중 오류가 발생했습니다:", error);
+    if (isFirst === "true") {
+      fetchUUID().then((uuids) => {
+        const fetchedUUID = uuids.length > 0 ? uuids[0] : null;
+        updatePrivilege(fetchedUUID);
+      })
+    } else {
+      updatePrivilege(uuid);
     }
   };
 
