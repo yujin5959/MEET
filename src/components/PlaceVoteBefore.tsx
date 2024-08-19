@@ -15,7 +15,6 @@ const PlaceVoteBefore = ({
   meetId,
   placeList,
   setIsVoted,
-  fetchPlaceVoteItems,
 }: PlaceVoteBeforeProps) => {
   const [places, setPlaces] = useState<Place[]>(placeList);
   const [newPlace, setNewPlace] = useState<string>(""); // 새로 추가할 모임 장소의 상태 관리

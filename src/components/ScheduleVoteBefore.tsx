@@ -72,7 +72,7 @@ const ScheduleVoteBefore = ({
   const handleRemoveSchedule = (id: string) => {
     server
       .delete(`/meet/schedule/item?scheduleVoteItemId=${id}`)
-      .then((response) => {
+      .then(() => {
         setSchedules((prevList) =>
           prevList.filter((schedule) => schedule.id !== id)
         );
@@ -111,7 +111,7 @@ const ScheduleVoteBefore = ({
           scheduleVoteItemList: selectedItemIdList,
         },
       })
-      .then((response) => {
+      .then(() => {
         setIsVoted(true);
       })
       .catch((error) => {
