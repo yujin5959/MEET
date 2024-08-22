@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import UserManage from "@/components/UserManage";
 import { server } from "@/utils/axios";
+import axios from "axios";
 
 type User = {
   id: string;
@@ -21,27 +22,25 @@ const Admin = () => {
   // UUID 가져오기
   const fetchUUID = async ():Promise<string[]> => {
     try {
-      const token = await server.get(
-        "/auth/admin/accessToken");
-      console.log("accesstoken", token.adminAccessToken);
-      const response = await server.get(
+      const tokenResponse = await server.get("/auth/admin/accessToken");
+      const adminAccessToken = tokenResponse.data.adminAccessToken;
+
+      const response = await axios.get(
         "https://kapi.kakao.com/v1/api/talk/friends",
         {
           headers: {
-            Authorization: `Bearer ${token.adminAccessToken}`,
+            Authorization: `Bearer ${adminAccessToken}`,
           },
         }
       );
 
-      console.log("카카오 API 응답:", response.data);
-      const friends = response.elements;
+      const friends = response.data.elements;
       const uuids = friends.map((friend: { uuid: string }) => friend.uuid);
       console.log("가져온 UUID 목록:", uuids);
-      
       return uuids;
     } catch (error) {
       console.error("UUID를 가져오는 중 오류가 발생했습니다:", error);
-      throw error;
+      return [];
     }
   };
 
@@ -76,7 +75,10 @@ const Admin = () => {
     uuid: string,
     isFirst: string
   ) => {
-    const newPrivilege = currentPrivilege === "accept" || currentPrivilege === "admin" ? "deny" : "accept";
+    const newPrivilege = 
+      currentPrivilege === "accept" || currentPrivilege === "admin" 
+        ? "deny" 
+        : "accept";
     
     const updatePrivilege = (fetchedUUID: string | null) => {
       const requestData = {
@@ -100,10 +102,17 @@ const Admin = () => {
     };
 
     if (isFirst === "true") {
-      fetchUUID().then((uuids) => {
-        const fetchedUUID = uuids.length > 0 ? uuids[0] : null;
-        updatePrivilege(fetchedUUID);
-      })
+      fetchUUID()
+        .then((uuids) => {
+          if (uuids && uuids.length > 0) {
+            const fetchedUUID = uuids[0];
+            updatePrivilege(fetchedUUID);
+          } else {
+            console.error("UUID를 가져오지 못했습니다. 권한 변경이 실패했습니다.");
+          }
+        }).catch((error) => {
+          console.error("UUID를 가져오는 중 오류가 발생했습니다:", error);
+        });
     } else {
       updatePrivilege(uuid);
     }

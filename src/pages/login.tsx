@@ -100,12 +100,12 @@ export const KakaoCode = () => {
 
           if (privilege === "admin" || privilege === "accepted") {
             navigate("/");
-          } else {
-            navigate("/Unauthorized");
           }
       })
       .catch ((error) => {
-            console.error("Error fetching token:", error);
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        }
       });
     }
   }, [token, navigate]);
