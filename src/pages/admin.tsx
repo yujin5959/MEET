@@ -34,6 +34,8 @@ const Admin = () => {
         }
       );
 
+      console.log('Kakao API 응답:', response.data);
+
       const friends = response.data.elements;
       const uuids = friends.map((friend: { uuid: string }) => friend.uuid);
       console.log("가져온 UUID 목록:", uuids);
@@ -80,7 +82,7 @@ const Admin = () => {
         ? "deny" 
         : "accept";
     
-    const updatePrivilege = (fetchedUUID: string | null) => {
+    const updatePrivilege = (fetchedUUID: string) => {
       const requestData = {
         memberId,
         option: newPrivilege,
@@ -92,7 +94,7 @@ const Admin = () => {
         .then(() => {
           setUsers((prevState) =>
             prevState.map((user) =>
-              user.id === memberId ? { ...user, previllege: newPrivilege } : user
+              user.id === memberId ? { ...user, previllege: newPrivilege, uuid:fetchedUUID } : user
             )
           );
         })
