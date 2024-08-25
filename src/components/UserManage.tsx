@@ -28,7 +28,7 @@ const UserManage = ({
               user.id,
               user.previllege,
               user.uuid,
-              user.isFirsts
+              user.isFirst
             )
           }
           className={`px-4 py-2 rounded-md bg-gray-400 text-white`}
