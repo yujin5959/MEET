@@ -13,6 +13,8 @@ const MeetEdit: React.FC = () => {
   const { meetId } = useParams<{ meetId: string }>();
   const navigate = useNavigate();
 
+  const [activeTab, setActiveTab] = useState<string>("");
+
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>("");
@@ -37,6 +39,11 @@ const MeetEdit: React.FC = () => {
     }
   }, [meetId]);
 
+  const handleTabClick = (tab: string, path: string) => {
+    setActiveTab(tab);
+    navigate(path);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
@@ -59,7 +66,7 @@ const MeetEdit: React.FC = () => {
       className="min-h-screen w-full flex flex-col"
       style={{ backgroundColor: "#F2F2F7" }}
       >
-        <div className="flex flex-col items-start m-6 space-y-6">
+        <div className="flex flex-col items-start m-6">
         <div className="flex pt-6 pb-6">
           {/* 뒤로가기 버튼 */}
             <i 
@@ -67,7 +74,7 @@ const MeetEdit: React.FC = () => {
               onClick={() => navigate("/meet")}
             ></i>
         </div>
-        <h1 className="text-2xl font-bold pl-4">모임 정보 수정</h1>
+        <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보 수정</h1>
         <form 
           className="w-full bg-white p-6 rounded-[24px] space-y-2" 
           onSubmit={handleSubmit}
@@ -119,12 +126,45 @@ const MeetEdit: React.FC = () => {
         {/* 수정하기 버튼 */}
         <button
           type="submit"
-          className="w-full h-[55px] bg-[#FFE607] p-2 rounded-[24px] text-black text-[16px] font-bold"
+          className="w-full h-[55px] bg-[#FFE607] p-2 mt-6 rounded-[24px] text-black text-[16px] font-bold"
           onClick={handleSubmit}  
         >
           수정하기
         </button>
       </div>
+      {/* Footer */}
+      <footer 
+        className="w-full h-[73px] bg-white flex justify-around items-center border-t border-[#E5E5EA]"
+        style={{ position: "fixed", bottom: 0 }}
+      >
+        <div 
+          className={`flex flex-col items-center cursor-pointer ${
+            activeTab === "list" ? "text-black" : "text-[#AEAEB2]"
+          }`}
+          onClick={() => handleTabClick("list", "/meet")}
+        >
+          <i className="fa-solid fa-bars text-[24px] mb-1"></i>
+          <span className="text-[10px]">LIST</span>
+        </div>
+        <div 
+          className={`flex flex-col items-center cursor-pointer ${
+            activeTab === "home" ? "text-black" : "text-[#AEAEB2]"
+          }`}
+          onClick={() => handleTabClick("home", "/")}
+        >
+          <i className="fa-solid fa-house text-[24px] mb-1"></i>
+          <span className="text-[10px]">HOME</span>
+        </div>
+        <div 
+          className={`flex flex-col items-center cursor-pointer ${
+            activeTab === "my" ? "text-black" : "text-[#AEAEB2]"
+          }`}
+          onClick={() => setActiveTab("my")}
+        >
+          <i className="fa-solid fa-user text-[24px] mb-1"></i>
+          <span className="text-[10px]">MY</span>
+        </div>
+      </footer>
     </div>
   );
 };
