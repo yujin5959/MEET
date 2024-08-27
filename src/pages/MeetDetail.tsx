@@ -80,8 +80,11 @@ const MeetDetail: React.FC = () => {
           navigate('/');
         })
         .catch((error) => {
-          if (error.code === "404") {
-            navigate("/not-found"); // 오류 발생 시 에러 페이지로 이동
+          if(error.code === "403"){
+            navigate("/Unauthorized");
+          }
+          else if(error.code === "404"){
+            navigate("/not-found");
           }
         });
     }
