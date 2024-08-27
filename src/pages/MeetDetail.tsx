@@ -37,8 +37,6 @@ const MeetDetail: React.FC = () => {
         server
           .get(`/meet?meetId=${meetId}`)
           .then((response) => {
-            console.log("API response:", response.data);
-  
             // participants가 문자열로 넘어오는 경우 변환 처리
             const data = response.data;
             if (typeof data.participants === "string") {
@@ -70,7 +68,7 @@ const MeetDetail: React.FC = () => {
 
   const handleEdit = () => {
     if (meetInfo) {
-      navigate(`/edit/${meetInfo.id}`);
+      navigate(`meet/edit/${meetInfo.id}`);
     }
   };
 
@@ -79,12 +77,12 @@ const MeetDetail: React.FC = () => {
       server
         .delete(`/meet?meetId=${meetId}`)
         .then(() => {
-          alert("모임이 삭제되었습니다.");
           navigate('/');
         })
         .catch((error) => {
-          console.error("삭제 오류:", error);
-          navigate("/not-found"); // 오류 발생 시 에러 페이지로 이동
+          if (error.code === "404") {
+            navigate("/not-found"); // 오류 발생 시 에러 페이지로 이동
+          }
         });
     }
   };  
@@ -92,14 +90,8 @@ const MeetDetail: React.FC = () => {
   if (loading) {
     return <div className="text-center py-8">Loading...</div>;
   }
-
-  if (error) {
-    return <div className="text-center py-8">Error: {error}</div>;
-  }
-
   if (!meetInfo) {
-    console.log("meetInfo is null or undefined"); 
-    return <div className="text-center py-8">모임 정보가 없습니다.</div>;
+    return <div className="text-center py-8">Loading...</div>;
   }
 
   // date.value를 Date 객체로 변환
