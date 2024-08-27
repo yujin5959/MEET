@@ -50,9 +50,12 @@ const MeetDetail: React.FC = () => {
   
             setMeetInfo(data);
           })
-          .catch(() => {
-            console.error("API 요청 오류");
-            navigate("/not-found");
+          .catch((error) => {
+            if (error.code === "403") {
+              navigate("/Unauthorized");
+            } else if (error.code === "404") {
+              navigate("/not-found");
+            }
           })
           .finally(() => {
             setLoading(false);
