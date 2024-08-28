@@ -10,34 +10,28 @@ type MeetInfo = {
   date: {
     value: string;
     editable: string;
-  } | null; // date를 null로 설정할 수 있도록 수정
+  } | null;
   place: {
     value: string;
     editable: string;
-  } | null; // place를 null로 설정할 수 있도록 수정
+  } | null;
   isAuthor: string;
   participantsNum: string;
   participants: string[];
-  editable: string; // editable 필드 추가
+  editable: string;
 };
 
 const MeetDetail: React.FC = () => {
   const { meetId } = useParams<{ meetId: string }>();
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // useNavigate hook을 사용하여 페이지 이동 처리
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("meetId:", meetId);
-  
     const fetchMeetDetail = () => {
       if (meetId) {
-        setLoading(true); // 로딩 상태 설정
         server
           .get(`/meet?meetId=${meetId}`)
           .then((response) => {
-            // participants가 문자열로 넘어오는 경우 변환 처리
             const data = response.data;
             if (typeof data.participants === "string") {
               try {
@@ -47,7 +41,6 @@ const MeetDetail: React.FC = () => {
                 data.participants = [];
               }
             }
-  
             setMeetInfo(data);
           })
           .catch((error) => {
@@ -56,18 +49,12 @@ const MeetDetail: React.FC = () => {
             } else if (error.code === "404") {
               navigate("/not-found");
             }
-          })
-          .finally(() => {
-            setLoading(false);
           });
-      } else {
-        setError("모임 ID가 제공되지 않았습니다.");
-        setLoading(false);
       }
     };
-  
+
     fetchMeetDetail();
-  }, [meetId, navigate]); // navigate를 의존성 배열에 추가
+  }, [meetId, navigate]);
 
   const handleEdit = () => {
     if (meetInfo) {
@@ -83,21 +70,17 @@ const MeetDetail: React.FC = () => {
           navigate('/');
         })
         .catch((error) => {
-          if(error.code === "403"){
+          if (error.code === "403") {
             navigate("/Unauthorized");
-          }
-          else if(error.code === "404"){
+          } else if (error.code === "404") {
             navigate("/not-found");
           }
         });
     }
-  };  
+  };
 
-  if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
-  }
   if (!meetInfo) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8">로딩 중...</div>;
   }
 
   // date.value를 Date 객체로 변환
