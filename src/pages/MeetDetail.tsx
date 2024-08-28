@@ -71,7 +71,7 @@ const MeetDetail: React.FC = () => {
 
   const handleEdit = () => {
     if (meetInfo) {
-      navigate(`meet/edit/${meetInfo.id}`);
+      navigate(`/meet/edit/${meetInfo.id}`);
     }
   };
 
