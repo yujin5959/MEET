@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import FooterNav from "../components/FooterNav";
 
 type MeetInfo = {
   id: string;
@@ -12,8 +13,6 @@ type MeetInfo = {
 const MeetEdit: React.FC = () => {
   const { meetId } = useParams<{ meetId: string }>();
   const navigate = useNavigate();
-
-  const [activeTab, setActiveTab] = useState<string>("");
 
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const [title, setTitle] = useState<string>("");
@@ -38,11 +37,6 @@ const MeetEdit: React.FC = () => {
       setContent(data.content);
     }
   }, [meetId]);
-
-  const handleTabClick = (tab: string, path: string) => {
-    setActiveTab(tab);
-    navigate(path);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,39 +126,9 @@ const MeetEdit: React.FC = () => {
           저장하기
         </button>
       </div>
-      {/* Footer */}
-      <footer 
-        className="w-full h-[73px] bg-white flex justify-around items-center border-t border-[#E5E5EA]"
-        style={{ position: "fixed", bottom: 0 }}
-      >
-        <div 
-          className={`flex flex-col items-center cursor-pointer ${
-            activeTab === "list" ? "text-black" : "text-[#AEAEB2]"
-          }`}
-          onClick={() => handleTabClick("list", "/meet")}
-        >
-          <i className="fa-solid fa-bars text-[24px] mb-1"></i>
-          <span className="text-[10px]">LIST</span>
-        </div>
-        <div 
-          className={`flex flex-col items-center cursor-pointer ${
-            activeTab === "home" ? "text-black" : "text-[#AEAEB2]"
-          }`}
-          onClick={() => handleTabClick("home", "/")}
-        >
-          <i className="fa-solid fa-house text-[24px] mb-1"></i>
-          <span className="text-[10px]">HOME</span>
-        </div>
-        <div 
-          className={`flex flex-col items-center cursor-pointer ${
-            activeTab === "my" ? "text-black" : "text-[#AEAEB2]"
-          }`}
-          onClick={() => setActiveTab("my")}
-        >
-          <i className="fa-solid fa-user text-[24px] mb-1"></i>
-          <span className="text-[10px]">MY</span>
-        </div>
-      </footer>
+
+      {/* 하단 네비게이션 바 */}
+      <FooterNav />
     </div>
   );
 };
