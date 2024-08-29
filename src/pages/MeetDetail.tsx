@@ -116,7 +116,7 @@ const MeetDetail: React.FC = () => {
 
           </div>
 
-          {meetInfo.editable === "true" && (
+          {meetInfo.isAuthor === "true" && (
           <div className="flex w-full mt-4">
           <button
             onClick={handleEdit}
