@@ -42,14 +42,7 @@ const MeetList: React.FC = () => {
       className="className=min-h-screen w-full flex flex-col"
       style={{ backgroundColor: "#F2F2F7", paddingBottom: "80px" }}
     > 
-    <div className="p-8">
-      <div className="flex items-start pb-10">
-        {/* 뒤로가기 버튼 */}
-        <i 
-          className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
-          onClick={() => navigate("/meet")}
-        ></i>
-      </div>
+    <div className="m-8">
       <div className="flex flex-col items-center justify-center h-[194px] bg-white rounded-[23px] space-y-2">
         <img src={magnifier} className="w-[69px] h-[69px]"></img>
         <h1 className="text-[20px] font-bold text-black">

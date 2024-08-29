@@ -129,14 +129,7 @@ const Admin = () => {
       style={{ backgroundColor: "#F2F2F7", paddingBottom: "80px" }}
     >
       {/* Main Content Area */}
-      <div className="flex-grow p-8">
-        <div className="flex items-start pb-10">
-          {/* 뒤로가기 버튼 */}
-          <i 
-            className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
-            onClick={() => navigate("/meet")}
-          ></i>
-        </div>
+      <div className="flex-grow m-8">
         <div>
           <h1 className="text-2xl font-bold mb-4 pl-4 black text-left">
             User List

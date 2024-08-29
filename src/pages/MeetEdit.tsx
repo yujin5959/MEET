@@ -60,14 +60,7 @@ const MeetEdit: React.FC = () => {
       className="min-h-screen w-full flex flex-col"
       style={{ backgroundColor: "#F2F2F7" }}
       >
-        <div className="flex flex-col items-start m-6">
-        <div className="flex pt-6 pb-6">
-          {/* 뒤로가기 버튼 */}
-            <i 
-              className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
-              onClick={() => navigate("/meet")}
-            ></i>
-        </div>
+        <div className="flex flex-col items-start m-8">
         <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보 수정</h1>
         <form 
           className="w-full bg-white p-6 rounded-[24px] space-y-2" 
