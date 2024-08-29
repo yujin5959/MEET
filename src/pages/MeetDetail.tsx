@@ -116,7 +116,7 @@ const MeetDetail: React.FC = () => {
 
           </div>
 
-          {meetInfo.editable === "true" && (
+          {meetInfo.isAuthor === "true" && (
           <div className="flex w-full mt-4">
           <button
             onClick={handleEdit}
@@ -126,7 +126,7 @@ const MeetDetail: React.FC = () => {
           </button>
           <button
             onClick={handleDelete}
-            className="flex-1 px-4 py-2 bg-[#FFE607] rounded-[24px] text-black font-bold"
+            className="flex-1 px-4 py-2 bg-[#FF3B30] rounded-[24px] text-black font-bold"
           >
             삭제
           </button>

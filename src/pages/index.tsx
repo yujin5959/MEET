@@ -7,3 +7,4 @@ export { default as MeetList } from "./MeetList";
 export { default as MeetDetail } from "./MeetDetail";
 export { default as MeetEdit } from "./MeetEdit";
 export { default as VotePage } from "./VotePage";
+export { default as JoinVotePage } from './JoinVotePage'; 
