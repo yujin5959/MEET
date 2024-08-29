@@ -200,7 +200,7 @@ const VotePage = () => {
       </div>
   
       {/* 일정 투표 섹션 */}
-      <div className="h-[230px] bg-white rounded-[24px] space-y-2 p-6 m-6 mt-0 overflow-y-auto">
+      <div className="bg-white rounded-[24px] space-y-2 p-6 m-6 mt-0">
         {isScheduleVoted ? (
           <ScheduleVoteAfter
             scheduleList={scheduleList}
@@ -219,7 +219,7 @@ const VotePage = () => {
       </div>
   
       {/* 장소 투표 섹션 */}
-      <div className="h-[230px] bg-white rounded-[24px] space-y-2 p-6 m-6 mt-0 overflow-y-auto">
+      <div className="bg-white rounded-[24px] space-y-2 p-6 m-6 mt-0">
         {isPlaceVoted ? (
           <PlaceVoteAfter
             placeList={placeList}
