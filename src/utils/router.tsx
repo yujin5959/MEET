@@ -44,7 +44,7 @@ const router: RouteObject[] = [
     element: <Pages.MeetDetail />,
   },
   {
-    path: "/meet/join/:meetId",
+    path: "/meet/join",
     element: <Pages.JoinVotePage />,
   } 
 ];
