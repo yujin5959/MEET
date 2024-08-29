@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
 
@@ -23,10 +23,12 @@ type MeetInfo = {
 };
 
 const MeetDetail: React.FC = () => {
-  const { meetId } = useParams<{ meetId: string }>();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchMeetDetail = () => {
       if (meetId) {
@@ -81,7 +83,7 @@ const MeetDetail: React.FC = () => {
   };
 
   if (!meetInfo) {
-    return <div className="text-center py-8">로딩 중...</div>;
+    return <div className="text-center py-8">meetDetail 로딩 중...</div>;
   }
 
   // date.value를 Date 객체로 변환

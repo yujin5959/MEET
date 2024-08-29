@@ -23,7 +23,6 @@ const MeetList: React.FC = () => {
       
       server.get(`/meet/list`)
         .then((response) => {
-          console.log("Response data:", response.data);
           setMeetList(response.data);
         })
         .catch(() => {
@@ -35,7 +34,7 @@ const MeetList: React.FC = () => {
     };
   
     fetchMeetList();
-  }, [navigate]);
+  }, []);
 
   return (
     <div 
@@ -62,7 +61,7 @@ const MeetList: React.FC = () => {
           ) : meetList.length > 0 ? (
             meetList.map((meet) => (
               <Link
-                to={`/meet/${meet.id}`}
+                to={`/meet?meetId=${meet.id}`}
                 key={meet.id}
                 className="w-full h-[86px] flex flex-row justify-around items-center bg-white rounded-[20px] p-3"
                 style={{ boxShadow: "1px 1px 10px 0 rgba(0, 0, 0, 0.05)" }}

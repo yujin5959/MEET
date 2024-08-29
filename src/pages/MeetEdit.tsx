@@ -1,59 +1,80 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation , useNavigate } from "react-router-dom";
+import { server } from "@/utils/axios";
+import { MeetInfo } from "@/types/MeetInfo";
 import FooterNav from "../components/FooterNav";
 
-type MeetInfo = {
-  id: string;
-  title: string;
-  date: string;
-  place: string;
-  content: string;
-};
 
 const MeetEdit: React.FC = () => {
-  const { meetId } = useParams<{ meetId: string }>();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
 
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
+  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [place, setPlace] = useState<string>("");
   const [content, setContent] = useState<string>("");
-
+  
   useEffect(() => {
-    // meetId가 1일 때 예시
-    if (meetId === "1") {
-      const data: MeetInfo = {
-        id: "1",
-        title: "2024 3분기 정기모임",
-        date: "2024-07-05",
-        place: "강남역",
-        content: "정기 모임 입니다.",
-      };
-      setMeetInfo(data);
-      setTitle(data.title);
-      setDate(data.date);
-      setPlace(data.place);
-      setContent(data.content);
+    // meetId 확인
+    if (meetId) {
+      //meet 조회
+      server.get(`/meet?meetId=${meetId}`)
+      .then((response) => {
+        setMeetInfo(response.data);
+        setTitle(response.data.title);
+        setDate(response.data.date.value);
+        setPlace(response.data.place.value);
+        setContent(response.data.content);
+
+        if(response.data.date.editable === 'false'){
+          const inputElement = document.getElementById('dateInput')! as HTMLInputElement;
+          inputElement.readOnly = true;
+        }
+
+        if(response.data.place.editable === 'false'){
+          const inputElement = document.getElementById('placeInput')! as HTMLInputElement;
+          inputElement.readOnly = true;
+        }
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
+    }
+    else{// meet Id 존재 x
+      navigate("/not-found");
     }
   }, [meetId]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({
-      title,
-      date,
-      place,
-      content,
-    });
+    server.put(`/meet?meetId=${meetId}` , {
+        data: {
+          title: title,
+          content: content,
+          date: date,
+          place: place,
+        }
+      })
+      .then((response) => {
+        // 저장 후 이전 페이지로 이동
+        navigate(`/meet?meetId=${meetId}`);
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
 
-    // 저장 후 이전 페이지로 이동
-    navigate(`/meet/${meetId}`);
+    
   };
-
-  if (!meetInfo) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div
@@ -81,6 +102,7 @@ const MeetEdit: React.FC = () => {
           <div>
           <label className="block text-[13px] text-[#8E8E93] text-left">날짜</label>
           <input
+            id='dateInput'
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -92,6 +114,7 @@ const MeetEdit: React.FC = () => {
           <div>
           <label className="block text-[13px] text-[#8E8E93] text-left">장소</label>
           <input
+            id='placeInput'
             type="text"
             value={place}
             onChange={(e) => setPlace(e.target.value)}

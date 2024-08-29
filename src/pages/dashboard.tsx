@@ -28,6 +28,7 @@ export const Dashboard = () => {
         if (response.code === "200" && response.data.previllege === "admin") {
           setIsAdmin(true);
         }
+        navigate('/meet/list');
       })
       .catch((error) => {
         console.error("권한 정보를 가져오는 중 오류 발생:", error);
