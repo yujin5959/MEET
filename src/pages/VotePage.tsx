@@ -7,6 +7,7 @@ import PlaceVoteAfter from "@/components/PlaceVoteAfter";
 import { server } from "@/utils/axios";
 import { Schedule } from "@/types/ScheduleVote";
 import { Place } from "@/types/PlaceVote";
+import FooterNav from "../components/FooterNav";
 
 type Meet = {
   meetTitle: string;
@@ -25,7 +26,6 @@ const VotePage = () => {
   const [isPlaceVoted, setIsPlaceVoted] = useState<boolean>(false);
   const [selectedScheduleIds, setSelectedScheduleIds] = useState<string[]>([]);
   const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("");
   
   // 페이지에 처음 로드될 때
   useEffect(() => {
@@ -174,29 +174,17 @@ const VotePage = () => {
     setSelectedPlaceIds(placeIds);
   };
 
-  // 네비바 클릭 핸들러
-  const handleTabClick = (tab: string, path: string) => {
-     setActiveTab(tab);
-     navigate(path);
-  };
-
   return (
     <div
-      className="min-h-screen w-full flex flex-col"
-      style={{ backgroundColor: "#F2F2F7" }}
+      className="w-full flex flex-col overflow-y-auto"
+      style={{ backgroundColor: "#F2F2F7", paddingBottom: "90px" }}
     >
-      {/* 헤더 및 뒤로가기 버튼 */}
-      <div className="flex flex-col items-start m-6 mb-3">
-        <div className="flex pt-6 pb-6">
-          <i 
-            className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
-            onClick={() => navigate("/")}
-          ></i>
-        </div>
-        <h1 className="text-2xl font-bold pl-4">
+      {/* 헤더 */}
+      <div className="flex flex-col items-start m-8 mb-3">
+        <h1 className="text-2xl font-bold">
           {meet.meetTitle}
         </h1>
-        <span className="text-[13px] text-[#8E8E93] mt-1 pl-4">
+        <span className="text-[13px] text-[#8E8E93] mt-1">
           투표 마감: {meet.endDate}
         </span>
       </div>
@@ -247,39 +235,8 @@ const VotePage = () => {
         {isScheduleVoted && isPlaceVoted ? "다시 투표하기" : "투표하기"}
       </button>
 
-      {/* Footer */}
-      <footer 
-        className="w-full h-[73px] bg-white flex justify-around items-center border-t border-[#E5E5EA]"
-        style={{ position: "fixed", bottom: 0 }}
-      >
-        <div 
-          className={`flex flex-col items-center cursor-pointer ${
-            activeTab === "list" ? "text-black" : "text-[#AEAEB2]"
-          }`}
-          onClick={() => handleTabClick("list", "/meet")}
-        >
-          <i className="fa-solid fa-bars text-[24px] mb-1"></i>
-          <span className="text-[10px]">LIST</span>
-        </div>
-        <div 
-          className={`flex flex-col items-center cursor-pointer ${
-            activeTab === "home" ? "text-black" : "text-[#AEAEB2]"
-          }`}
-          onClick={() => handleTabClick("home", "/")}
-        >
-          <i className="fa-solid fa-house text-[24px] mb-1"></i>
-          <span className="text-[10px]">HOME</span>
-        </div>
-        <div 
-          className={`flex flex-col items-center cursor-pointer ${
-            activeTab === "admin" ? "text-black" : "text-[#AEAEB2]"
-          }`}
-          onClick={() => handleTabClick("admin", "/admin")}
-        >
-          <i className="fa-solid fa-user text-[24px] mb-1"></i>
-          <span className="text-[10px]">ADMIN</span>
-        </div>
-      </footer>
+      {/* 하단 네비게이션 바 */}
+      <FooterNav />
     </div>
   );  
 };
