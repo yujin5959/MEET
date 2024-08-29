@@ -32,26 +32,20 @@ const PlaceVoteAfter = ({
   };
 
   return (
-    <div className="space-y-4 flex flex-col h-full">
-      <div className="overflow-y-auto flex-grow" style={{ maxHeight: "60vh" }}>
+    <div className="flex flex-col h-full">
+      <div className="overflow-y-auto flex-grow">
         {placeList.map((place) => (
         <div
           key={place.id}
-          className={`flex items-center justify-between p-2 my-2 ${
-            mostVotedPlaceIds.includes(place.id) ? "bg-yellow-200" : ""
-          } rounded-lg`}
+          className={`flex items-center justify-between pr-2 my-2 ${
+            mostVotedPlaceIds.includes(place.id) ? "border-b-[5px] border-[#FFE607] my-2" : ""
+          }`}
         >
           <span>{place.place}</span>
-          <span className="ml-4">투표 수: {place.memberList.length}</span>
+          <span className="text-[#8E8E93] text-[13px]">{place.memberList.length}명</span>
         </div>
         ))}
       </div>
-      <button
-        onClick={onVoteAgain}
-        className="bg-gray-200 rounded-lg px-4 py-2 text-black w-full"
-      >
-        다시 투표하기
-      </button>
     </div>
   );
 };

@@ -32,21 +32,17 @@ const router: RouteObject[] = [
     element: <Pages.NotFound />,
   },
   {
-    path: "/meet/schedule/:meetId",
-    element: <Pages.ScheduleVotePage />,
-  },
-  {
     path: "/meet/:meetId",
     element: <Pages.MeetDetail />,
-  },
-  {
-    path: "meet/place/:meetId",
-    element: <Pages.PlaceVotePage />,
   },
   {
     path: "meet/edit/:meetId",
     element: <Pages.MeetEdit />,
   },
+  {
+    path: "/meet/vote/:meetId",
+    element: <Pages.VotePage />,
+  }
 ];
 
 export default router;
