@@ -177,18 +177,12 @@ const VotePage = () => {
       className="w-full flex flex-col overflow-y-auto"
       style={{ backgroundColor: "#F2F2F7", paddingBottom: "90px" }}
     >
-      {/* 헤더 및 뒤로가기 버튼 */}
-      <div className="flex flex-col items-start m-6 mb-3">
-        <div className="flex pt-6 pb-6">
-          <i 
-            className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
-            onClick={() => navigate("/meet")}
-          ></i>
-        </div>
-        <h1 className="text-2xl font-bold pl-4">
+      {/* 헤더 */}
+      <div className="flex flex-col items-start m-8 mb-3">
+        <h1 className="text-2xl font-bold">
           {meet.meetTitle}
         </h1>
-        <span className="text-[13px] text-[#8E8E93] mt-1 pl-4">
+        <span className="text-[13px] text-[#8E8E93] mt-1">
           투표 마감: {meet.endDate}
         </span>
       </div>

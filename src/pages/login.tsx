@@ -16,22 +16,21 @@ export const Login = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "#242424" }}
+      className="min-h-screen w-full flex flex-col justify-center"
+      style={{ backgroundColor: "#F2F2F7" }}
     >
-      <div
-        className="p-8 rounded-lg shadow-md w-full max-w-md mx-4"
-        style={{ backgroundColor: "#3f3f3f" }}
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center text-white">
-          로그인
+      <div className="h-[350px] flex flex-col justify-between mx-6">
+        <h2 className="font-bold text-[32px] text-left text-black leading-[1.3]">
+          간편로그인 후 <br />
+          이용이 <br />
+          가능합니다
         </h2>
         <button
           onClick={handleLogin}
-          className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+          className="w-full h-[55px] bg-[#FFE607] hover:bg-[#FFE607] rounded-[30px] text-black font-bold text-[16px] flex justify-center items-center"
         >
-          <i className="fa-solid fa-comment mr-2"></i>
-          카카오 로그인
+          <i className="fa-solid fa-comment mr-3 text-[25px]"></i>
+          카카오로 계속하기
         </button>
       </div>
     </div>
