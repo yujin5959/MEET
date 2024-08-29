@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import UserManage from "@/components/UserManage";
 import { server } from "@/utils/axios";
 import axios from "axios";
+import FooterNav from "../components/FooterNav";
 
 type User = {
   id: string;
@@ -14,6 +16,7 @@ type User = {
 
 const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserList();
@@ -122,26 +125,35 @@ const Admin = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "#242424" }}
+      className="min-h-screen w-full flex flex-col"
+      style={{ backgroundColor: "#F2F2F7", paddingBottom: "80px" }}
     >
-      <div
-        className="p-8 rounded-lg shadow-md w-full max-w-md mx-4"
-        style={{ backgroundColor: "#3f3f3f" }}
-      >
-        <h1 className="text-2xl font-bold mb-6 text-center text-white">
-          User List
-        </h1>
-        <ul className="max-w-full divide-y divide-gray-700">
-          {users.map((user) => (
-            <UserManage
-              key={user.id}
-              user={user}
-              handlePermissionChange={handlePermissionChange}
-            />
-          ))}
-        </ul>
+      {/* Main Content Area */}
+      <div className="flex-grow p-8">
+        <div className="flex items-start pb-10">
+          {/* 뒤로가기 버튼 */}
+          <i 
+            className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
+            onClick={() => navigate("/meet")}
+          ></i>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold mb-4 pl-4 black text-left">
+            User List
+          </h1>
+          <ul className="max-w-full">
+            {users.map((user) => (
+              <UserManage
+                key={user.id}
+                user={user}
+                handlePermissionChange={handlePermissionChange}
+              />
+            ))}
+          </ul>
+        </div>
       </div>
+      {/* 하단 네비게이션 바 */}
+      <FooterNav />
     </div>
   );
 };

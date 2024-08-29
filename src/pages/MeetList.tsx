@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { server } from "@/utils/axios";
 import FooterNav from "../components/FooterNav";
+import magnifier from "../assets/img/magnifier.png";
+import calender from "../assets/img/calender.png"
 
 type MeetInfo = {
   id: string;
@@ -36,21 +38,32 @@ const MeetList: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className="relative min-h-screen pb-20 bg-gray-100"> {/* 콘텐츠에 하단 여백 추가 */}
-    <div className="fixed top-0 left-0 w-full bg-blue-500 text-white shadow-lg rounded-b-3xl" style={{ height: "120px", zIndex: 10 }}>
-      <div className="flex flex-col items-center justify-center h-full px-6 max-w-4xl mx-auto text-center">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 leading-tight">
-          지금 참여할 모임을 찾아보세요!
+    <div 
+      className="className=min-h-screen w-full flex flex-col"
+      style={{ backgroundColor: "#F2F2F7", paddingBottom: "80px" }}
+    > 
+    <div className="p-8">
+      <div className="flex items-start pb-10">
+        {/* 뒤로가기 버튼 */}
+        <i 
+          className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
+          onClick={() => navigate("/meet")}
+        ></i>
+      </div>
+      <div className="flex flex-col items-center justify-center h-[194px] bg-white rounded-[23px] space-y-2">
+        <img src={magnifier} className="w-[69px] h-[69px]"></img>
+        <h1 className="text-[20px] font-bold text-black">
+          지금 참여할 모임을 찾아보세요
         </h1>
-        <p className="text-base md:text-lg max-w-xl mx-auto mt-2 md:mt-4 leading-relaxed">
-          시간과 장소를 보고 자신에게 맞는 모임을 찾아보세요. <br />
+        <p className="text-[12px] text-[#8E8E93]">
           즐거운 시간을 보낼 기회를 놓치지 마세요!
         </p>
       </div>
-    </div>
+    
       {/* 메인 콘텐츠 */}
-      <div className="pt-20 bg-gray-100"> {/* 패딩을 줄여서 헤더와의 간격을 조정 */}
-        <div className="pt-4 flex flex-col items-center m-8 space-y-4">
+      <div> 
+      <p className="flex flex-row-reverse text-[12px] text-[#AEAEB2] mt-6 mb-2 mr-4">날짜순</p>
+        <div className="flex flex-col items-center space-y-4">
           {loading ? (
             <div>Loading...</div>
           ) : meetList.length > 0 ? (
@@ -58,23 +71,23 @@ const MeetList: React.FC = () => {
               <Link
                 to={`/meet/${meet.id}`}
                 key={meet.id}
-                className="w-full p-4 bg-white shadow rounded-md hover:bg-gray-100 text-black text-left"
+                className="w-full h-[86px] flex flex-row justify-around items-center bg-white rounded-[20px] p-3"
+                style={{ boxShadow: "1px 1px 10px 0 rgba(0, 0, 0, 0.05)" }}
               >
-                <h2 className="text-xl font-bold">{meet.title}</h2>
-                <p>
-                  <i className="fa-solid fa-calendar-days"></i>{" "}
-                  {meet.date ? meet.date : "날짜 미정"}
-                </p>
-                <p>
-                  <i className="fa-solid fa-location-dot"></i>{" "}
-                  {meet.place ? meet.place : "장소 미정"}
-                </p>
+                <img src={calender} className="w-[28.3px] h-[25px]"></img>
+                <div className="w-[170px] flex flex-col items-start">
+                  <h2 className="text-[15px] font-bold text-black">{meet.title}</h2>
+                  <p className="text-[12px] text-[#AEAEB2]">{meet.date ? meet.date : "날짜 미정"}</p>
+                  <p className="text-[12px] text-[#AEAEB2]">{meet.place ? meet.place : "장소 미정"}</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-[20px] text-[#AEAEB2]"></i>
               </Link>
             ))
           ) : (
             <div>No meetings found.</div>
           )}
         </div>
+      </div>
       </div>
 
       {/* 하단 네비게이션 바 */}
