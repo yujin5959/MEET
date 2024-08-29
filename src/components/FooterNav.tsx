@@ -8,7 +8,7 @@ const FooterNav: React.FC = () => {
     <nav className="fixed bottom-0 w-full bg-blue-500 text-white font-bold py-5" style={{ zIndex: 20 }}>
       <div className="flex justify-around">
         <a
-          onClick={() => navigate("/meet")}
+          onClick={() => navigate("/meet/list")}
           className="text-white hover:text-gray-400 cursor-pointer font-bold"
         >
           모임

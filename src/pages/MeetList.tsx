@@ -21,7 +21,6 @@ const MeetList: React.FC = () => {
       
       server.get(`/meet/list`)
         .then((response) => {
-          console.log("Response data:", response.data);
           setMeetList(response.data);
         })
         .catch(() => {
@@ -33,7 +32,7 @@ const MeetList: React.FC = () => {
     };
   
     fetchMeetList();
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="relative min-h-screen pb-20 bg-gray-100"> {/* 콘텐츠에 하단 여백 추가 */}
@@ -56,7 +55,7 @@ const MeetList: React.FC = () => {
           ) : meetList.length > 0 ? (
             meetList.map((meet) => (
               <Link
-                to={`/meet/${meet.id}`}
+                to={`/meet?meetId=${meet.id}`}
                 key={meet.id}
                 className="w-full p-4 bg-white shadow rounded-md hover:bg-gray-100 text-black text-left"
               >
