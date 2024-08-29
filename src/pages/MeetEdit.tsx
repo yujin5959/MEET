@@ -123,13 +123,13 @@ const MeetEdit: React.FC = () => {
           />
           </div>
         </form>
-        {/* 수정하기 버튼 */}
+        {/* 저장하기 버튼 */}
         <button
           type="submit"
           className="w-full h-[55px] bg-[#FFE607] p-2 mt-6 rounded-[24px] text-black text-[16px] font-bold"
           onClick={handleSubmit}  
         >
-          수정하기
+          저장하기
         </button>
       </div>
       {/* Footer */}
