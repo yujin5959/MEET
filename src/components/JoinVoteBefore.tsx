@@ -1,6 +1,7 @@
 import { voteItem } from "@/types/JoinVote";
 import React, { useState } from "react";
 import { server } from "@/utils/axios";
+import { useNavigate } from "react-router-dom";
 
 // 투표 전 컴포넌트
 const JoinVoteBefore = ({
@@ -15,7 +16,7 @@ const JoinVoteBefore = ({
   itemList: voteItem[]
 }) => {
   const [participateId, setParticipateId] = useState<string>("");
-
+  const navigate = useNavigate();
   const handleVote = () => {
     if (participateId) {
       server.put("/meet/participate", {
@@ -24,12 +25,16 @@ const JoinVoteBefore = ({
           participateVoteItemIdList: [participateId]
         },
       })
-      .then((response) => {
+      .then(() => {
         setIsVoted(true);
         setVotedItem(participateId);
       })
       .catch((error) => {
-         
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
       });
       
     }

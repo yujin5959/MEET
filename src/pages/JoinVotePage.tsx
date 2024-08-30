@@ -20,7 +20,6 @@ const JoinVotePage = () => {
   const [itemList, setItemList] = useState<voteItem[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
   const [votedItem, setVotedItem] = useState<string>(""); //투표 여부 상태 저장을 위한
-  var loginedUserId: String;
 
   // 페이지에 처음 로드될 때
   useEffect(() => {

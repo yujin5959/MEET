@@ -16,7 +16,6 @@ type User = {
 
 const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserList();
