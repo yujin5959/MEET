@@ -47,7 +47,7 @@ const JoinVotePage = () => {
   
   const fetchMemberInfo = () => {
     server
-      .get(`/meet/place/item/list?meetId=${meetId}`)
+      .get(`/meet/participate/item/list?meetId=${meetId}`)
       .then((response) => {
         response.data.forEach((item: voteItem) => {
           if (item.isVote === "true") {
