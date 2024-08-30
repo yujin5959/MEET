@@ -6,6 +6,7 @@ import alarm from '../assets/img/alarm.png';
 import vote from '../assets/img/vote.png';
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
+import { voteItem } from "@/types/JoinVote";
 
 const JoinVotePage = () => {
   const navigate = useNavigate();
@@ -16,15 +17,16 @@ const JoinVotePage = () => {
     date: "",
     place: "", 
   });
+  const [itemList, setItemList] = useState<voteItem[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
-  const [votedStatus, setVotedStatus] = useState<string>("");//투표 여부 상태 저장을 위한
+  const [votedItem, setVotedItem] = useState<string>(""); //투표 여부 상태 저장을 위한
 
   // 페이지에 처음 로드될 때
   useEffect(() => {
     const fetchData = async () => {
       if (meetId) {
         await fetchMeet(); // 모임 정보
-        await checkUserVotedBefore(); // 사용자가 이미 투표했는지 확인
+        await fetchMemberInfo();
       }
       else{
         navigate('/not-found');
@@ -35,11 +37,34 @@ const JoinVotePage = () => {
 
   // isVoted가 변경될 때
   useEffect(() => {
-    if (isVoted) {
-      fetchMeet();
-    }
+    const fetchData = async () => {
+      await fetchItemList();
+    };
+  
+    fetchData();
   }, [isVoted]);
   
+  const fetchMemberInfo = () => {
+    server
+      .get(`/meet/participate/item/list?meetId=${meetId}`)
+      .then((response) => {
+        response.data.forEach((item: voteItem) => {
+          if (item.isVote === "true") {
+              setIsVoted(true);
+              setVotedItem(item.id);
+          }
+        });
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
+
+  }
+
   // 모임 정보 조회
   const fetchMeet = () => {
     server
@@ -70,27 +95,10 @@ const JoinVotePage = () => {
   };
 
   // 사용자가 이미 투표했는지 확인하는 함수
-  const checkUserVotedBefore = () => {
-    let loginedUserId: string | undefined;
-
-    server
-      .get("/member")
+  const fetchItemList = () => {
+    server.get(`/meet/participate/item/list?meetId=${meetId}`)
       .then((response) => {
-        loginedUserId = response.data.id; // 로그인한 사용자의 ID를 저장
-        return server.get(`/meet/participate/vote?meetId=${meetId}`);
-      })
-      .then((response) => {
-        const votes = response.data; // 투표 정보 리스트
-
-        // 사용자가 투표했는지 확인 (참여 또는 불참여)
-        const userVote = votes.find((vote: any) => vote.memberId === loginedUserId);
-
-        if (userVote) {
-          setIsVoted(true);
-          setVotedStatus(userVote.status || "참여"); // 상태를 '참여' 또는 '불참여'로 설정
-        } else {
-          setIsVoted(false);
-        }
+        setItemList(response.data)
       })
       .catch((error) => {
         if (error.code === "403") {
@@ -100,7 +108,7 @@ const JoinVotePage = () => {
         }
       });
   };
-
+  
   const formatDate = (dateString: string) => {
     const formattedString = dateString.replace(" ", "T");
     const date = new Date(formattedString);
@@ -116,18 +124,11 @@ const JoinVotePage = () => {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
-
+  };;
+  
   return (
     <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
       <div className="flex flex-col items-start m-6">
-        <div className="flex pt-6 pb-6">
-          {/* 뒤로가기 버튼 */}
-          <i
-            className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2]"
-            onClick={() => navigate("/meet")}
-          ></i>
-        </div>
         <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
 
         <div className="w-full bg-white p-6 rounded-[24px] space-y-2 flex items-center">
@@ -150,9 +151,10 @@ const JoinVotePage = () => {
         </div>
         <div className="w-full mt-6">
           {isVoted ? (
-            <JoinVoteAfter votedStatus={votedStatus} setIsVoted={setIsVoted} />
+            <JoinVoteAfter votedItemId={votedItem} setIsVoted={setIsVoted} itemList={itemList}/>
           ) : (
-            <JoinVoteBefore meetId={meetId!} setIsVoted={setIsVoted} setVotedStatus={setVotedStatus} />
+            <JoinVoteBefore meetId={meetId!} setIsVoted={setIsVoted} setVotedItem={setVotedItem} itemList={itemList}/>
+            
           )}
         </div>
       </div>

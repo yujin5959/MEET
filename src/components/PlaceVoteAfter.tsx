@@ -4,12 +4,10 @@ import { Place } from "@/types/PlaceVote";
 // 컴포넌트 props 타입 정의
 type PlaceVoteAfterProps = {
   placeList: Place[];
-  onVoteAgain: () => void;
 };
 
 const PlaceVoteAfter = ({
   placeList,
-  onVoteAgain
 }: PlaceVoteAfterProps) => {
   const [mostVotedPlaceIds, setMostVotedPlaceIds] = useState<string[]>([]);
 

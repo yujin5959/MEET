@@ -211,7 +211,6 @@ const VotePage = () => {
         {isPlaceVoted ? (
           <PlaceVoteAfter
             placeList={placeList}
-            onVoteAgain={handleVoteAgain}
           />
         ) : (
           <PlaceVoteBefore

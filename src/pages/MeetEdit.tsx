@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams , useNavigate } from "react-router-dom";
 import { server } from "@/utils/axios";
-import { MeetInfo } from "@/types/MeetInfo";
 import FooterNav from "../components/FooterNav";
 
 
 const MeetEdit: React.FC = () => {
   const navigate = useNavigate();
 
-  const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const {meetId} = useParams();
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>("");
@@ -22,7 +20,6 @@ const MeetEdit: React.FC = () => {
       //meet 조회
       server.get(`/meet?meetId=${meetId}`)
       .then((response) => {
-        setMeetInfo(response.data);
         setTitle(response.data.title);
         setDate(response.data.date.value);
         setTime(response.data.date.time);
@@ -52,7 +49,7 @@ const MeetEdit: React.FC = () => {
     }
   }, [meetId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = () => {
     server.put(`/meet?meetId=${meetId}` , {
         data: {
           title: title,
@@ -62,7 +59,7 @@ const MeetEdit: React.FC = () => {
           place: place,
         }
       })
-      .then((response) => {
+      .then(() => {
         // 저장 후 이전 페이지로 이동
         navigate(`/meet/${meetId}`);
       })

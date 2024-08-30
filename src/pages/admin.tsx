@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import UserManage from "@/components/UserManage";
 import { server } from "@/utils/axios";
 import axios from "axios";
@@ -16,7 +15,6 @@ type User = {
 
 const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserList();
