@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import JoinVoteBefore from "../components/JoinVoteBefore";
 import JoinVoteAfter from "../components/JoinVoteAfter";
 import alarm from '../assets/img/alarm.png';
@@ -9,10 +9,8 @@ import { server } from "@/utils/axios";
 import { voteItem } from "@/types/JoinVote";
 
 const JoinVotePage = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
-  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
+  const {meetId} = useParams();
   const [meet, setMeet] = useState({
     meetTitle: "",
     endDate: "",
@@ -30,6 +28,9 @@ const JoinVotePage = () => {
       if (meetId) {
         await fetchMeet(); // 모임 정보
         await fetchMemberInfo();
+      }
+      else{
+        navigate('/not-found');
       }
     };
     fetchData();

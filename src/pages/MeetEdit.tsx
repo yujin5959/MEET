@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useLocation , useNavigate } from "react-router-dom";
+import { useParams , useNavigate } from "react-router-dom";
 import { server } from "@/utils/axios";
 import { MeetInfo } from "@/types/MeetInfo";
 import FooterNav from "../components/FooterNav";
 
 
 const MeetEdit: React.FC = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
 
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
-  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
+  const {meetId} = useParams();
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState<string>("");
   const [place, setPlace] = useState<string>("");
   const [content, setContent] = useState<string>("");
   
@@ -26,6 +25,7 @@ const MeetEdit: React.FC = () => {
         setMeetInfo(response.data);
         setTitle(response.data.title);
         setDate(response.data.date.value);
+        setTime(response.data.date.time);
         setPlace(response.data.place.value);
         setContent(response.data.content);
 
@@ -33,7 +33,7 @@ const MeetEdit: React.FC = () => {
           const inputElement = document.getElementById('dateInput')! as HTMLInputElement;
           inputElement.readOnly = true;
         }
-
+        
         if(response.data.place.editable === 'false'){
           const inputElement = document.getElementById('placeInput')! as HTMLInputElement;
           inputElement.readOnly = true;
@@ -58,14 +58,16 @@ const MeetEdit: React.FC = () => {
           title: title,
           content: content,
           date: date,
+          time: time,
           place: place,
         }
       })
       .then((response) => {
         // 저장 후 이전 페이지로 이동
-        navigate(`/meet?meetId=${meetId}`);
+        navigate(`/meet/${meetId}`);
       })
       .catch((error) => {
+        console.log(error)
         if (error.code === "403") {
           navigate("/Unauthorized");
         } else if (error.code === "404") {
@@ -106,6 +108,18 @@ const MeetEdit: React.FC = () => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            className="mt-2 block w-full text-[18px] font-bold bg-transparent"
+          />
+          </div>
+
+          {/* 시간 입력 필드 */}
+          <div>
+          <label className="block text-[13px] text-[#8E8E93] text-left">시간</label>
+          <input
+            id='timeInput'
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
             className="mt-2 block w-full text-[18px] font-bold bg-transparent"
           />
           </div>

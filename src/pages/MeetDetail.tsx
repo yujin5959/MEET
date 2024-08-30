@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
 
@@ -10,6 +10,7 @@ type MeetInfo = {
   type: string;
   date: {
     value: string;
+    time: string;
     editable: string;
   } | null;
   place: {
@@ -23,9 +24,7 @@ type MeetInfo = {
 };
 
 const MeetDetail: React.FC = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
+  const {meetId} = useParams();
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const navigate = useNavigate();
   
@@ -95,13 +94,7 @@ const MeetDetail: React.FC = () => {
     return (
       <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
         <div className="flex flex-col items-start m-8 space-y-4">
-          <div className="flex items-center w-full mb-4">
-            {/* 뒤로가기 버튼 */}
-            <i
-              className="fa-solid fa-chevron-left text-[25px] text-[#AEAEB2] cursor-pointer"
-              onClick={() => navigate(-1)}
-            ></i>
-          </div>
+
           <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
           {/* <h1 className="text-lg font-bold">{meetInfo.title || "모임 제목"}</h1> */}
           <div className="w-full bg-white p-6 rounded-[24px] space-y-2 text-left">
@@ -109,6 +102,8 @@ const MeetDetail: React.FC = () => {
           <p className="text-lg font-bold">{meetInfo.title}</p>
           <p className="text-sm text-[#8E8E93]">날짜</p>
           <p className="text-lg font-bold">{formattedDate}</p>
+          <p className="text-sm text-[#8E8E93]">시간</p>
+          <p className="text-lg font-bold">{meetInfo.date?.time ? meetInfo.date.time : "시간 미정"}</p>
           <p className="text-sm text-[#8E8E93]">위치</p>
           <p className="text-lg font-bold">{meetInfo.place?.value ? meetInfo.place.value : "장소 미정"}</p>
           <p className="text-sm text-[#8E8E93]">내용</p>
