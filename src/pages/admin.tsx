@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import UserManage from "@/components/UserManage";
 import { server } from "@/utils/axios";
 import axios from "axios";
