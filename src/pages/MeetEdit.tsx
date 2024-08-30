@@ -67,6 +67,7 @@ const MeetEdit: React.FC = () => {
         navigate(`/meet/${meetId}`);
       })
       .catch((error) => {
+        console.log(error)
         if (error.code === "403") {
           navigate("/Unauthorized");
         } else if (error.code === "404") {
@@ -107,6 +108,18 @@ const MeetEdit: React.FC = () => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            className="mt-2 block w-full text-[18px] font-bold bg-transparent"
+          />
+          </div>
+
+          {/* 시간 입력 필드 */}
+          <div>
+          <label className="block text-[13px] text-[#8E8E93] text-left">시간</label>
+          <input
+            id='timeInput'
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
             className="mt-2 block w-full text-[18px] font-bold bg-transparent"
           />
           </div>
