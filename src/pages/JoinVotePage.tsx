@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import JoinVoteBefore from "../components/JoinVoteBefore";
 import JoinVoteAfter from "../components/JoinVoteAfter";
 import alarm from '../assets/img/alarm.png';
@@ -8,10 +8,8 @@ import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
 
 const JoinVotePage = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
-  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
+  const {meetId} = useParams();
   const [meet, setMeet] = useState({
     meetTitle: "",
     endDate: "",
@@ -27,6 +25,9 @@ const JoinVotePage = () => {
       if (meetId) {
         await fetchMeet(); // 모임 정보
         await checkUserVotedBefore(); // 사용자가 이미 투표했는지 확인
+      }
+      else{
+        navigate('/not-found');
       }
     };
     fetchData();
@@ -92,7 +93,6 @@ const JoinVotePage = () => {
         }
       })
       .catch((error) => {
-        console.error("투표 여부 확인 에러:", error);
         if (error.code === "403") {
           navigate("/Unauthorized");
         } else if (error.code === "404") {

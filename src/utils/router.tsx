@@ -32,19 +32,19 @@ const router: RouteObject[] = [
     element: <Pages.NotFound />,
   },
   {
-    path: "meet/edit",
+    path: "meet/edit/:meetId",
     element: <Pages.MeetEdit />,
   },
   {
-    path: "/meet/vote",
+    path: "/meet/vote/:meetId",
     element: <Pages.VotePage />,
   },
   {
-    path: "/meet",
+    path: "/meet/:meetId",
     element: <Pages.MeetDetail />,
   },
   {
-    path: "/meet/join",
+    path: "/meet/join/:meetId",
     element: <Pages.JoinVotePage />,
   } 
 ];
