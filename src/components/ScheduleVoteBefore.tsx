@@ -18,6 +18,7 @@ const ScheduleVoteBefore = ({
 }: ScheduleVoteBeforeProps) => {
   const [schedules, setSchedules] = useState<Schedule[]>(scheduleList);
   const [newDate, setNewDate] = useState<string>("");
+  const [newTime, setNewTime] = useState<string>("");
   const [isAdding, setIsAdding] = useState<boolean>(false); 
   const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
   const navigate = useNavigate();
@@ -40,6 +41,11 @@ const ScheduleVoteBefore = ({
     setNewDate(event.target.value);
   };
 
+  // 시간 입력 상태 관리 함수
+  const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTime(event.target.value);
+  };
+
   // 일정 추가 함수
   const handleAddSchedule = async () => {
     server.post(
@@ -48,13 +54,15 @@ const ScheduleVoteBefore = ({
         data: {
           meetId: meetId,
           date: newDate,
+          time: newTime,
         }
       }
     )
     .then((response) => {
       const newSchedule: Schedule = {
         id: response.data.id,
-        date: response.data.date,
+        date: `${response.data.date}`,
+        time: `${response.data.time}`,
         editable: response.data.editable,
         isVote: response.data.isVote,
         memberList: response.data.memberList,
@@ -62,6 +70,7 @@ const ScheduleVoteBefore = ({
 
       setSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
       setNewDate("");
+      setNewTime("");
       setIsAdding(false);
     })
     .catch((error) => {
@@ -113,7 +122,7 @@ const ScheduleVoteBefore = ({
                 handleCheckboxChange(schedule.id, e.target.checked)
               }
             />
-            <span>{schedule.date}</span>
+            <span>{`${schedule.date} ${schedule.time}`}</span>
           </div>
 
           {schedule.editable === "true" && (
@@ -142,6 +151,12 @@ const ScheduleVoteBefore = ({
               value = {newDate}
               onChange={handleDateChange}
               className="border border-[#F2F2F7] rounded-lg px-2 py-1 w-full"
+            />
+            <input
+            type="time"
+            value={newTime}
+            onChange={handleTimeChange}
+            className="border border-[#F2F2F7] rounded-lg px-2 py-1 w-full"
             />
             <div className="flex space-x-2">
               <button
