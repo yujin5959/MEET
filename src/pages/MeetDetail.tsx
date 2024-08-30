@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
 
@@ -23,9 +23,7 @@ type MeetInfo = {
 };
 
 const MeetDetail: React.FC = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const [meetId, setMeetId] = useState<string | null>(queryParams.get('meetId'));
+  const {meetId} = useParams();
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const navigate = useNavigate();
   
