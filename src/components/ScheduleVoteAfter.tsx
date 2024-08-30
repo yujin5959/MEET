@@ -9,7 +9,6 @@ type ScheduleVoteAfterProps = {
 
 const ScheduleVoteAfter = ({
   scheduleList,
-  setIsVoted,
   fetchScheduleVoteItems  
 }: ScheduleVoteAfterProps) => {
   useEffect(() => {
@@ -42,7 +41,7 @@ const ScheduleVoteAfter = ({
             mostVotedScheduleIds.includes(schedule.id) ? "border-b-[5px] border-[#FFE607] my-1" : ""
           }`}
         >
-          <span>{schedule.date}</span>
+          <span>{`${schedule.date} ${schedule.time}`}</span>
           <span className="text-[#8E8E93] text-[13px]">{schedule.memberList.length}명</span>
         </div>
       ))}
