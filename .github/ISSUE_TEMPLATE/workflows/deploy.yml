@@ -1,0 +1,42 @@
+name: Build and Deploy React App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./
+
+      - name: Create env file
+        run: |
+          touch ./client/.env.production
+          echo "${{ secrets.VITE_SECRET }}" > ./.env.production
+          sudo cat ./.env.production
+
+      - name: Build Project
+        run: npm run build
+        working-directory: ./        
+
+      - name: Deploy
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          port: 22
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          source: ./dist
+          target: /usr/share/nginx/html
+          overwrite: true

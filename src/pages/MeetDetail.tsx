@@ -58,6 +58,19 @@ const MeetDetail: React.FC = () => {
     fetchMeetDetail();
   }, [meetId, navigate]);
 
+  useEffect(() => {
+    if (meetInfo) {
+      if (!meetInfo.date || !meetInfo.place) {
+        // 날짜나 장소가 없으면 날짜/장소 투표 페이지로 이동
+        navigate(`/meet/vote/${meetInfo.id}`);
+      } else if (meetInfo.participants.length === 0) {
+        // 참여자가 없으면 참여 여부 투표 페이지로 이동
+        navigate(`/meet/join/${meetInfo.id}`);
+      }
+    }
+  }, [meetInfo, navigate]);
+
+
   const handleEdit = () => {
     if (meetInfo) {
       navigate(`/meet/edit/${meetInfo.id}`);
@@ -91,13 +104,12 @@ const MeetDetail: React.FC = () => {
     ? `${meetingDate.getFullYear()}-${('0' + (meetingDate.getMonth() + 1)).slice(-2)}-${('0' + meetingDate.getDate()).slice(-2)}`
     : "날짜 미정";
 
-    return (
-      <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
-        <div className="flex flex-col items-start m-8 space-y-4">
-
-          <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
-          {/* <h1 className="text-lg font-bold">{meetInfo.title || "모임 제목"}</h1> */}
-          <div className="w-full bg-white p-6 rounded-[24px] space-y-2 text-left">
+  return (
+    <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
+      <div className="flex flex-col items-start m-8 space-y-4">
+        <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
+        {/* <h1 className="text-lg font-bold">{meetInfo.title || "모임 제목"}</h1> */}
+        <div className="w-full bg-white p-6 rounded-[24px] space-y-2 text-left">
           <p className="text-sm text-[#8E8E93]">제목</p>
           <p className="text-lg font-bold">{meetInfo.title}</p>
           <p className="text-sm text-[#8E8E93]">날짜</p>
@@ -110,28 +122,27 @@ const MeetDetail: React.FC = () => {
           <p className="text-lg font-bold">{meetInfo.content ? meetInfo.content : "내용 없음"}</p>
           <p className="text-sm text-[#8E8E93]">참여자</p>
           <p className="text-lg font-bold">{meetInfo.participants.length > 0 ? meetInfo.participants.join(", ") : " 참여자 없음"}</p>
-
-          </div>
-
-          {meetInfo.isAuthor === "true" && (
-          <div className="flex w-full mt-4">
-          <button
-            onClick={handleEdit}
-            className="mr-2 flex-1 px-4 py-3 bg-[#FFE607] rounded-[24px] text-black font-bold"
-          >
-            수정
-          </button>
-          <button
-            onClick={handleDelete}
-            className="flex-1 px-4 py-2 bg-[#FF3B30] rounded-[24px] text-black font-bold"
-          >
-            삭제
-          </button>
-          </div>
-          )}
         </div>
-        <FooterNav />
+
+        {meetInfo.isAuthor === "true" && (
+          <div className="flex w-full mt-4">
+            <button
+              onClick={handleEdit}
+              className="mr-2 flex-1 px-4 py-3 bg-[#FFE607] rounded-[24px] text-black font-bold"
+            >
+              수정
+            </button>
+            <button
+              onClick={handleDelete}
+              className="flex-1 px-4 py-2 bg-[#FF3B30] rounded-[24px] text-black font-bold"
+            >
+              삭제
+            </button>
+          </div>
+        )}
       </div>
-    );
-  };
+      <FooterNav />
+    </div>
+  );
+};
 export default MeetDetail;

@@ -4,8 +4,11 @@ import ServerError from "@/types/serverError";
 
 const api = axios.create({
 
-  baseURL: "http://54.180.29.36",}
-);
+  baseURL: "https://43.201.106.225",
+  httpsAgent: new (require('https').Agent)({  
+    rejectUnauthorized: false 
+  })
+});
 
 const whiteList = ["/auth/login","/auth/token/refresh"]
 
