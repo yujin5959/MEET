@@ -30,6 +30,9 @@ jobs:
         run: npm run build
         working-directory: ./        
 
+      - name: Check dist folder
+        run: ls -al ./dist
+
       - name: Deploy
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -37,6 +40,6 @@ jobs:
           port: 22
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          source: ./dist
+          source: ${{ github.workspace }}/dist
           target: /usr/share/nginx/html
           overwrite: true
