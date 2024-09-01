@@ -4,7 +4,7 @@ import ServerError from "@/types/serverError";
 
 const api = axios.create({
 
-  baseURL: "https://meetplace.store/api",
+  baseURL: "http://43.203.36.37/api",
 });
 
 const whiteList = ["/auth/login","/auth/token/refresh"]
