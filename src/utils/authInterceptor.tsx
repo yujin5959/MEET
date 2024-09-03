@@ -21,7 +21,7 @@ const AuthInterceptor: React.FC<AuthInterceptorProps> = ({ children }) => {
     } else if (token && !accessingLoginPage) {
       const fetchPrivilege = async () => {
         try {
-          const privilegeUrl = "http://54.180.29.36/member/previllege";
+          const privilegeUrl = "http://43.203.36.37/member/previllege";
           const privilegeResponse = await axios.get(privilegeUrl, {
             headers: {
               Authorization: `${token}`,
