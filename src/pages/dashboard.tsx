@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import { server } from "@/utils/axios";
+import FooterNav from "../components/FooterNav";
 
 const adminUrl = "/admin";
 const handleAdmin = () => {
@@ -17,16 +17,14 @@ const handleAdmin = () => {
     });
 };
 
-export const Dashboard = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate('/meet/list');
-  }, []);
-
+export const Dashboard = () => {  
+  window.location.href = '/meet/list'
   return (
-    <>
-      
-    </>
+    <div 
+      className="className=min-h-screen w-full flex flex-col"
+      style={{ backgroundColor: "#F2F2F7", paddingBottom: "80px" }}
+    > 
+      <FooterNav />
+    </div>
   );
 };
