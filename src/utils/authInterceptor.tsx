@@ -1,7 +1,7 @@
 // src/utils/AuthInterceptor.tsx
 import React, { ReactNode, useEffect } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
-import axios from "axios";
+import { server } from "@/utils/axios";
 
 interface AuthInterceptorProps {
   children?: ReactNode;
@@ -21,13 +21,13 @@ const AuthInterceptor: React.FC<AuthInterceptorProps> = ({ children }) => {
     } else if (token && !accessingLoginPage) {
       const fetchPrivilege = async () => {
         try {
-          const privilegeUrl = "http://43.203.36.37/member/previllege";
-          const privilegeResponse = await axios.get(privilegeUrl, {
+          const privilegeUrl = "/member/previllege";
+          const privilegeResponse = await server.get(privilegeUrl, {
             headers: {
               Authorization: `${token}`,
             },
           });
-          const privilege = privilegeResponse.data.data.previllege;
+          const privilege = privilegeResponse.data.previllege;
 
           if (privilege === "admin" || privilege === "accepted") {
             navigate(location.pathname, { replace: true });

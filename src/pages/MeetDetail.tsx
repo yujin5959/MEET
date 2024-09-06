@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
+import { Meet } from "@/types/Meet";
 
 type MeetInfo = {
   id: string;
@@ -20,12 +21,21 @@ type MeetInfo = {
   isAuthor: string;
   participantsNum: string;
   participants: string[];
-  editable: string;
+};
+
+type ParticipationInfo = {
+  meetTitle: string;
+  date: string;
+  place: string;
+  endDate: string;
 };
 
 const MeetDetail: React.FC = () => {
   const {meetId} = useParams();
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
+  const [placeVoteInfo, setPlaceVoteInfo] = useState<Meet | null>(null);
+  const [scheduleVoteInfo, setScheduleVoteInfo] = useState<Meet | null>(null);
+  const [participationInfo, setParticipationInfo] = useState<ParticipationInfo | null>(null);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -55,20 +65,43 @@ const MeetDetail: React.FC = () => {
       }
     };
 
+    const fetchVoteInfo = () => {
+      if (meetId) {
+        server
+          .get(`/meet/place?meetId=${meetId}`)
+          .then((response) => setPlaceVoteInfo(response.data))
+          .catch(console.error);
+
+        server
+          .get(`/meet/schedule?meetId=${meetId}`)
+          .then((response) => setScheduleVoteInfo(response.data))
+          .catch(console.error);
+
+        server
+          .get(`/meet/participate?meetId=${meetId}`)
+          .then((response) => setParticipationInfo(response.data))
+          .catch(console.error);
+      }
+    };
+
     fetchMeetDetail();
+    fetchVoteInfo();
   }, [meetId, navigate]);
 
   useEffect(() => {
-    if (meetInfo) {
-      if (!meetInfo.date || !meetInfo.place) {
-        // 날짜나 장소가 없으면 날짜/장소 투표 페이지로 이동
+    if (meetInfo && placeVoteInfo && scheduleVoteInfo && participationInfo) {
+      const now = new Date();
+      const placeVoteEndDate = placeVoteInfo?.endDate ? new Date(placeVoteInfo.endDate) : null;
+      const scheduleVoteEndDate = scheduleVoteInfo?.endDate ? new Date(scheduleVoteInfo.endDate) : null;
+      const participationEndDate = participationInfo?.endDate ? new Date(participationInfo.endDate) : null;
+
+      if ((placeVoteEndDate && now < placeVoteEndDate) || (scheduleVoteEndDate && now < scheduleVoteEndDate)) {
         navigate(`/meet/vote/${meetInfo.id}`);
-      } else if (meetInfo.participants.length === 0) {
-        // 참여자가 없으면 참여 여부 투표 페이지로 이동
+      } else if (participationEndDate && now < participationEndDate) {
         navigate(`/meet/join/${meetInfo.id}`);
       }
     }
-  }, [meetInfo, navigate]);
+  }, [meetInfo, placeVoteInfo, scheduleVoteInfo, participationInfo]);
 
 
   const handleEdit = () => {
@@ -108,7 +141,6 @@ const MeetDetail: React.FC = () => {
     <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
       <div className="flex flex-col items-start m-8 space-y-4">
         <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
-        {/* <h1 className="text-lg font-bold">{meetInfo.title || "모임 제목"}</h1> */}
         <div className="w-full bg-white p-6 rounded-[24px] space-y-2 text-left">
           <p className="text-sm text-[#8E8E93]">제목</p>
           <p className="text-lg font-bold">{meetInfo.title}</p>

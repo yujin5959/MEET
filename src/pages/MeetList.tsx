@@ -14,27 +14,21 @@ type MeetInfo = {
 
 const MeetList: React.FC = () => {
   const [meetList, setMeetList] = useState<MeetInfo[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchMeetList = () => {
-      setLoading(true);
-      
+    const fetchMeetList = async () => {
       server.get(`/meet/list`)
         .then((response) => {
           setMeetList(response.data);
         })
         .catch(() => {
           navigate("/not-found");
-        })
-        .finally(() => {
-          setLoading(false);
         });
     };
   
     fetchMeetList();
-  }, []);
+  }, [navigate]);
 
   return (
     <div 
@@ -54,11 +48,9 @@ const MeetList: React.FC = () => {
     
       {/* 메인 콘텐츠 */}
       <div> 
-      <p className="flex flex-row-reverse text-[12px] text-[#AEAEB2] mt-6 mb-2 mr-4">날짜순</p>
+      <p className="flex flex-row-reverse text-[12px] text-[#AEAEB2] mt-6 mb-2 mr-4">최신순</p>
         <div className="flex flex-col items-center space-y-4">
-          {loading ? (
-            <div>Loading...</div>
-          ) : meetList.length > 0 ? (
+          {meetList.length > 0 ? (
             meetList.map((meet) => (
               <Link
                 to={`/meet/${meet.id}`}
