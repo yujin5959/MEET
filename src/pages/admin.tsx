@@ -15,10 +15,37 @@ type User = {
 
 const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [hasPrivilege, setHasPrivilege] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    fetchUserList();
+    fetchPrevilege();
   }, []);
+
+  useEffect(() => {
+    if(hasPrivilege == undefined){
+      return;
+    }
+    if(hasPrivilege){
+      fetchUserList();
+    }
+    else{
+      window.location.href = '/Unauthorized'
+    }
+  }, [hasPrivilege]);
+
+  const fetchPrevilege = async () => {
+    await server.get(
+      "/member/previllege",
+    )
+    .then((response) => {
+      setHasPrivilege(response.data.previllege === "admin");
+    })
+    .catch(() => {
+      setHasPrivilege(false);
+    })
+
+    
+  };
 
   // UUID 가져오기
   const fetchUUID = async (memberId: string): Promise<string | null> => {

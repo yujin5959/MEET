@@ -1,29 +1,24 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import error from "../../assets/img/error.png"
 
 export const Unauthorized = () => {
   const navigate = useNavigate();
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "#242424" }}
+      className="min-h-screen flex flex-col justify-center"
+      style={{ backgroundColor: "#F2F2F7" }}
     >
-      <div
-        className="p-8 rounded-lg shadow-md w-full max-w-md mx-4"
-        style={{ backgroundColor: "#3f3f3f" }}
-      >
-        <p className="text-2xl font-bold mb-6 text-center text-white">
-          <i
-            className="fa-solid fa-triangle-exclamation"
-            style={{ fontSize: "48px" }}
-          ></i>
-        </p>
-        <p className="text-center text-white mb-4">
-          접근 권한이 없습니다. 관리자에게 문의하세요.
-        </p>
+      <div className="h-[300px] flex flex-col justify-between mx-6">
+        <div className="flex flex-col items-center justify-center">
+          <img src={error} className="w-[70px] pb-5"></img>
+          <p className="font-bold text-[20px] text-center text-black ">
+            접근 권한이 없습니다. <br/> 관리자에게 문의하세요.
+          </p>
+        </div>
         <button
           onClick={() => navigate("/auth/login")}
-          className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+          className="w-full h-[55px] bg-[#FFE607] hover:bg-[#FFE607] rounded-[30px] text-black font-bold text-[16px] flex justify-center items-center"
         >
           로그인으로 돌아가기
         </button>
