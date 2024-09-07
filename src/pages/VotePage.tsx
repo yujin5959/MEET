@@ -35,15 +35,11 @@ const VotePage = () => {
     fetchVote();
   }, [meetId]);
   
-  // 투표 상태에 따라 투표 항목 다시 조회
   useEffect(() => {
-    if (isScheduleVoted) {
-      fetchScheduleVoteItems();
+    if (scheduleList.length > 0 && placeList.length > 0) {
+      checkUserVotedBefore();
     }
-    if (isPlaceVoted) {
-      fetchPlaceVoteItems();
-    }
-  }, [isScheduleVoted, isPlaceVoted]);
+  }, [scheduleList, placeList]);
 
   // 모임 정보 조회
   const fetchMeet = () => {
@@ -70,7 +66,7 @@ const VotePage = () => {
 
   // 일정 투표 항목 조회
   const fetchScheduleVoteItems = async () => {
-    server
+    await server
       .get(`/meet/schedule/item/list?meetId=${meetId}`)
       .then((response) => {
         setScheduleList(response.data);
@@ -91,7 +87,7 @@ const VotePage = () => {
 
   // 장소 투표 항목 조회
   const fetchPlaceVoteItems = async () => {
-    server
+    await server
       .get(`/meet/place/item/list?meetId=${meetId}`)
       .then((response) => {
         setPlaceList(response.data);
@@ -100,6 +96,31 @@ const VotePage = () => {
           .filter((place: Place) => place.isVote === "true")
           .map((place: Place) => place.id);
         setSelectedPlaceIds(votedPlaceIds);
+      })
+      .catch((error) => {
+        if (error.code === "403") {
+          navigate("/Unauthorized");
+        } else if (error.code === "404") {
+          navigate("/not-found");
+        }
+      });
+  };
+
+  // 사용자 투표 여부 확인 함수
+  const checkUserVotedBefore = () => {
+    server.get("/member")
+      .then((response) => {
+        const loginedUserId = response.data.id;
+
+        const scheduleVoted = scheduleList.some(schedule => 
+          schedule.memberList.some(member => member.id === loginedUserId)
+        );
+        const placeVoted = placeList.some(place => 
+          place.memberList.some(member => member.id === loginedUserId)
+        );
+
+        setIsScheduleVoted(scheduleVoted);
+        setIsPlaceVoted(placeVoted);
       })
       .catch((error) => {
         if (error.code === "403") {
@@ -131,7 +152,6 @@ const VotePage = () => {
       })
       .then(() => {
         setIsPlaceVoted(true);
-  
         return Promise.all([fetchScheduleVoteItems(), fetchPlaceVoteItems()]);
       })
       .catch((error) => {
