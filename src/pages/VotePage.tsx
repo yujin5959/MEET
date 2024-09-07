@@ -31,7 +31,6 @@ const VotePage = () => {
       await fetchMeet();
       await fetchScheduleVoteItems();
       await fetchPlaceVoteItems();
-      await checkUserVotedBefore();
     }
     fetchVote();
   }, [meetId]);
@@ -75,6 +74,11 @@ const VotePage = () => {
       .get(`/meet/schedule/item/list?meetId=${meetId}`)
       .then((response) => {
         setScheduleList(response.data);
+
+        const votedScheduleIds = response.data
+          .filter((schedule: Schedule) => schedule.isVote === "true")
+          .map((schedule: Schedule) => schedule.id);
+        setSelectedScheduleIds(votedScheduleIds);
       })
       .catch((error) => {
         if (error.code === "403") {
@@ -91,6 +95,11 @@ const VotePage = () => {
       .get(`/meet/place/item/list?meetId=${meetId}`)
       .then((response) => {
         setPlaceList(response.data);
+
+        const votedPlaceIds = response.data
+          .filter((place: Place) => place.isVote === "true")
+          .map((place: Place) => place.id);
+        setSelectedPlaceIds(votedPlaceIds);
       })
       .catch((error) => {
         if (error.code === "403") {
@@ -100,29 +109,6 @@ const VotePage = () => {
         }
       });
   };
-
-  // 사용자 투표 여부 확인 함수
-  const checkUserVotedBefore = () => {
-    server.get("/member")
-      .then((response) => {
-        const loginedUserId = response.data.id;
-        const scheduleVoted = scheduleList.some(schedule => 
-          schedule.memberList.some(member => member.id === loginedUserId)
-        );
-        const placeVoted = placeList.some(place => 
-          place.memberList.some(member => member.id === loginedUserId)
-        );
-        setIsScheduleVoted(scheduleVoted);
-        setIsPlaceVoted(placeVoted);
-      })
-      .catch((error) => {
-        if (error.code === "403") {
-          navigate("/Unauthorized");
-        } else if (error.code === "404") {
-          navigate("/not-found");
-        }
-      });
-};
 
   // 투표하기 버튼 클릭 핸들러
   const handleVoteClick = () => {
@@ -202,6 +188,7 @@ const VotePage = () => {
             setIsVoted={setIsScheduleVoted}
             fetchScheduleVoteItems={fetchScheduleVoteItems}
             handleScheduleChange={handleScheduleChange}
+            selectedScheduleIds={selectedScheduleIds}
           />
         )}
       </div>
@@ -219,6 +206,7 @@ const VotePage = () => {
             setIsVoted={setIsPlaceVoted}
             fetchPlaceVoteItems={fetchScheduleVoteItems}
             handlePlaceChange={handlePlaceChange}
+            selectedPlaceIds={selectedPlaceIds} 
           />
         )}
       </div>

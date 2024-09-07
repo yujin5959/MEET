@@ -9,32 +9,25 @@ type ScheduleVoteBeforeProps = {
   setIsVoted: (value: boolean) => void;
   fetchScheduleVoteItems: () => void;
   handleScheduleChange: (scheduleIds: string[]) => void;
+  selectedScheduleIds: string[];
 };
 
 const ScheduleVoteBefore = ({
   meetId,
   scheduleList,
   handleScheduleChange,
+  selectedScheduleIds,
 }: ScheduleVoteBeforeProps) => {
   const [schedules, setSchedules] = useState<Schedule[]>(scheduleList);
   const [newDate, setNewDate] = useState<string>("");
   const [newTime, setNewTime] = useState<string>("");
   const [isAdding, setIsAdding] = useState<boolean>(false); 
-  const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
   const navigate = useNavigate();
 
   // 컴포넌트 마운트 시 초기 일정 목록 설정
   useEffect(() => {
     setSchedules(scheduleList);
   }, [scheduleList]);  
-
-  // 일정이 변경될 때 선택된 일정 목록을 업데이트
-  useEffect(() => {
-    const updatedSelectedItemIdList = schedules
-      .filter((schedule) => schedule.isVote === "true")
-      .map((schedule) => schedule.id);
-    setSelectedItemIdList(updatedSelectedItemIdList);
-  }, [schedules]);
 
   // 날짜 입력 상태 관리 함수
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,13 +92,13 @@ const ScheduleVoteBefore = ({
         }
       });
   };
+
   // 체크박스 상태 변경할 때
   const handleCheckboxChange = (id: string, checked: boolean) => {
     const updatedList = checked
-      ? [...selectedItemIdList, id]
-      : selectedItemIdList.filter((itemId) => itemId !== id);
+      ? [...selectedScheduleIds, id]
+      : selectedScheduleIds.filter((itemId) => itemId !== id);
 
-    setSelectedItemIdList(updatedList);
     handleScheduleChange(updatedList);
   };
 
@@ -117,7 +110,7 @@ const ScheduleVoteBefore = ({
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
-              checked={selectedItemIdList.includes(schedule.id)}
+              checked={selectedScheduleIds.includes(schedule.id)}
               onChange={(e) =>
                 handleCheckboxChange(schedule.id, e.target.checked)
               }

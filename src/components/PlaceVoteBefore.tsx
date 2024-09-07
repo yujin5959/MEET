@@ -9,17 +9,19 @@ type PlaceVoteBeforeProps = {
   setIsVoted: (value: boolean) => void; // 투표 여부 상태 업데이트 함수
   fetchPlaceVoteItems: () => void; // 장소 목록을 새로 가져오는 함수 
   handlePlaceChange: (placeIds: string[]) => void; // 장소 변경 핸들러
+  selectedPlaceIds: string[];
 };
 
 const PlaceVoteBefore = ({
   meetId,
   placeList,
   handlePlaceChange,
+  selectedPlaceIds,
 }: PlaceVoteBeforeProps) => {
   const [places, setPlaces] = useState<Place[]>(placeList);
   const [newPlace, setNewPlace] = useState<string>("");
   const [isAdding, setIsAdding] = useState<boolean>(false);
-  const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
+  // const [selectedItemIdList, setSelectedItemIdList] = useState<string[]>([]);
   const navigate = useNavigate();
 
   // 컴포넌트 마운트 시 초기 장소 목록 설정
@@ -28,12 +30,12 @@ const PlaceVoteBefore = ({
   }, [placeList]);
 
   // 장소가 변경될 때 선택된 장소 목록을 업데이트
-  useEffect(() => {
-    const updatedSelectedItemIdList = places
-      .filter((place) => place.isVote === "true")
-      .map((place) => place.id);
-    setSelectedItemIdList(updatedSelectedItemIdList);
-  }, [places]);
+  // useEffect(() => {
+  //   const updatedSelectedItemIdList = places
+  //     .filter((place) => place.isVote === "true")
+  //     .map((place) => place.id);
+  //   setSelectedItemIdList(updatedSelectedItemIdList);
+  // }, [places]);
 
   // 새로운 장소 입력 상태 관리 함수
   const handleNewPlaceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,11 +92,16 @@ const PlaceVoteBefore = ({
   // 체크박스 변경
   const handleCheckboxChange = (id: string, checked: boolean) => {
     const updatedList = checked
-    ? [...selectedItemIdList, id]
-    : selectedItemIdList.filter((itemId) => itemId !== id);
+      ? [...selectedPlaceIds, id]
+      : selectedPlaceIds.filter((itemId) => itemId !== id);
 
-  setSelectedItemIdList(updatedList);
-  handlePlaceChange(updatedList);
+    handlePlaceChange(updatedList);
+  //   const updatedList = checked
+  //   ? [...selectedItemIdList, id]
+  //   : selectedItemIdList.filter((itemId) => itemId !== id);
+
+  // setSelectedItemIdList(updatedList);
+  // handlePlaceChange(updatedList);
   };
 
   return (
@@ -105,7 +112,7 @@ const PlaceVoteBefore = ({
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
-              checked={selectedItemIdList.includes(place.id)}
+              checked={selectedPlaceIds.includes(place.id)}
               onChange={(e) => handleCheckboxChange(place.id, e.target.checked)}
             />
             <span>{place.place}</span> 

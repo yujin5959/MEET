@@ -21,7 +21,7 @@ const Admin = () => {
   }, []);
 
   // UUID 가져오기
-  const fetchUUID = async ():Promise<string[]> => {
+  const fetchUUID = async (memberId: string): Promise<string | null> => {
     try {
       const tokenResponse = await server.get("/auth/admin/accessToken");
       const adminAccessToken = tokenResponse.data.adminAccessToken;
@@ -38,12 +38,16 @@ const Admin = () => {
       console.log('Kakao API 응답:', response.data);
 
       const friends = response.data.elements;
-      const uuids = friends.map((friend: { uuid: string }) => friend.uuid);
-      console.log("가져온 UUID 목록:", uuids);
-      return uuids;
+      for (let i = 0; i < friends.length; i++) {
+          if (friends[i].id.toString() == memberId) {
+              return friends[i].uuid;
+          }
+      }
+      // 일치하는 id가 없으면 null 반환
+      return null;
     } catch (error) {
       console.error("UUID를 가져오는 중 오류가 발생했습니다:", error);
-      return [];
+      return null;
     }
   };
 
@@ -105,11 +109,10 @@ const Admin = () => {
     };
 
     if (isFirst === "true") {
-      fetchUUID()
-        .then((uuids) => {
-          if (uuids && uuids.length > 0) {
-            const fetchedUUID = uuids[0];
-            updatePrivilege(fetchedUUID);
+      fetchUUID(memberId)
+        .then((uuid) => {
+          if (uuid) {
+            updatePrivilege(uuid);
           } else {
             console.error("UUID를 가져오지 못했습니다. 권한 변경이 실패했습니다.");
           }

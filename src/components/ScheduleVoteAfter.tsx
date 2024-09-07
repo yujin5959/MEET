@@ -12,10 +12,11 @@ const ScheduleVoteAfter = ({
   fetchScheduleVoteItems  
 }: ScheduleVoteAfterProps) => {
   useEffect(() => {
-    fetchScheduleVoteItems(); // 컴포넌트가 로드될 때 fetch 함수 호출
+    fetchScheduleVoteItems(); 
   }, []);
 
   var mostVotedScheduleIds: string[] = [];
+
   // 가장 많은 투표를 받은 일정의 ID 배열 구하기
   const findSchedulesWithLongestMemberList = (schedules: Schedule[]): string[] => {
     if (schedules.length === 0) return [];
@@ -41,7 +42,12 @@ const ScheduleVoteAfter = ({
             mostVotedScheduleIds.includes(schedule.id) ? "border-b-[5px] border-[#FFE607] my-1" : ""
           }`}
         >
-          <span>{`${schedule.date} ${schedule.time}`}</span>
+          <div className="flex items-center">
+            {schedule.isVote === "true" && (
+              <i className="fa-solid fa-check text-[black] mr-2"></i>
+            )}
+            <span>{`${schedule.date} ${schedule.time}`}</span>
+          </div>
           <span className="text-[#8E8E93] text-[13px]">{schedule.memberList.length}명</span>
         </div>
       ))}
