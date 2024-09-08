@@ -72,7 +72,7 @@ const JoinVotePage = () => {
       .then((response) => {
         const data = response.data;
 
-        const meetDateString = data.date || "정보 없음";
+        const meetDateString = data.date || "날짜 미정";
         const formattedMeetDate = formatDate(meetDateString);
 
         const endDateString = data.endDate || "정보 없음";
@@ -114,7 +114,7 @@ const JoinVotePage = () => {
     const date = new Date(formattedString);
 
     if (isNaN(date.getTime())) {
-      return "정보 없음";
+      return "날짜 미정";
     }
 
     return date.toLocaleString("ko-KR", {

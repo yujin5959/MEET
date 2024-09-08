@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import { voteItem } from "@/types/JoinVote";
+import VotedMemberList from "./popUp/VotedMemberList";
 
 const JoinVoteAfter = ({
   votedItemId,
@@ -10,9 +11,23 @@ const JoinVoteAfter = ({
   setIsVoted: React.Dispatch<React.SetStateAction<boolean>>
   itemList: voteItem[]
 }) => {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedVoteItem, setSelectedVoteItem] = useState<voteItem | null>(null);
+
   // 다시 투표하기 눌렀을 때
   const handleButtonClick = () => {
     setIsVoted(false);
+  };
+
+  // 팝업 열기/닫기 토글 함수, 스케줄을 설정
+  const openPopup = (item: voteItem) => {
+    setSelectedVoteItem(item);  // 선택된 스케줄을 상태에 저장
+    setIsPopupOpen(true);  // 팝업 열기
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedVoteItem(null);  // 팝업을 닫을 때 스케줄 초기화
   };
   
   return (
@@ -26,7 +41,7 @@ const JoinVoteAfter = ({
             }`}
           >
             <span className="font-semibold text-lg">{item.name}</span>
-            <span className="text-md">{item.memberList.length}</span>
+            <span className="text-md" onClick={() => openPopup(item)}>{item.memberList.length}</span>
           </div>
         ))}
       </div>
@@ -37,6 +52,11 @@ const JoinVoteAfter = ({
       >
         다시 투표하기
       </button>
+
+      {/* 팝업 열림 상태라면 멤버 리스트 보여주기 */}
+      {isPopupOpen && selectedVoteItem && (
+        <VotedMemberList selectedItem={selectedVoteItem} closePopup={closePopup} />
+      )}
     </div>
   );
 };
