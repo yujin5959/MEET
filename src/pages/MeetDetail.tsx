@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
 import { Meet } from "@/types/Meet";
+import { ParticipationInfo } from "@/types/participationInfo";
 
 type MeetInfo = {
   id: string;
@@ -23,86 +24,99 @@ type MeetInfo = {
   participants: string[];
 };
 
-type ParticipationInfo = {
-  meetTitle: string;
-  date: string;
-  place: string;
-  endDate: string;
-};
-
 const MeetDetail: React.FC = () => {
   const {meetId} = useParams();
   const [meetInfo, setMeetInfo] = useState<MeetInfo | null>(null);
   const [placeVoteInfo, setPlaceVoteInfo] = useState<Meet | null>(null);
   const [scheduleVoteInfo, setScheduleVoteInfo] = useState<Meet | null>(null);
   const [participationInfo, setParticipationInfo] = useState<ParticipationInfo | null>(null);
+  const [formattedDate, setFormattedDate] = useState<String | null>(null);
+
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    const fetchMeetDetail = () => {
-      if (meetId) {
-        server
-          .get(`/meet?meetId=${meetId}`)
-          .then((response) => {
-            const data = response.data;
-            if (typeof data.participants === "string") {
-              try {
-                data.participants = JSON.parse(data.participants.replace(/'/g, '"'));
-              } catch (parseError) {
-                console.error("참여자 데이터 파싱 오류:", parseError);
-                data.participants = [];
-              }
-            }
-            setMeetInfo(data);
-          })
-          .catch((error) => {
-            if (error.code === "403") {
-              navigate("/Unauthorized");
-            } else if (error.code === "404") {
-              navigate("/not-found");
-            }
-          });
-      }
-    };
 
-    const fetchVoteInfo = () => {
-      if (meetId) {
-        server
-          .get(`/meet/place?meetId=${meetId}`)
-          .then((response) => setPlaceVoteInfo(response.data))
-          .catch(console.error);
+  const fetchMeetDetail = async () => {
+    if (meetId) {
+      server
+        .get(`/meet?meetId=${meetId}`)
+        .then((response) => {
+          const data = response.data;
+          if (typeof data.participants === "string") {
+            try {
+              data.participants = JSON.parse(data.participants.replace(/'/g, '"'));
+            } catch (parseError) {
+              console.error("참여자 데이터 파싱 오류:", parseError);
+              data.participants = [];
+            }
+          }
+          setMeetInfo(data);
 
-        server
+          // date.value를 Date 객체로 변환
+          const meetingDate = response.data.date?.value ? new Date(response.data.date.value) : null;
+          setFormattedDate(meetingDate
+            ? `${meetingDate.getFullYear()}-${('0' + (meetingDate.getMonth() + 1)).slice(-2)}-${('0' + meetingDate.getDate()).slice(-2)}`
+            : "날짜 미정");
+        })
+        .catch((error) => {
+          if (error.code === "403") {
+            navigate("/Unauthorized");
+          } else if (error.code === "404") {
+            navigate("/not-found");
+          }
+        });
+    }
+  };
+
+  const fetchVoteInfo = async() => {
+    if (meetId) {
+      server
+        .get(`/meet/place?meetId=${meetId}`)
+        .then((response) => {
+          setPlaceVoteInfo(response.data);
+          
+          server
           .get(`/meet/schedule?meetId=${meetId}`)
-          .then((response) => setScheduleVoteInfo(response.data))
-          .catch(console.error);
+          .then((response) => {
+            setScheduleVoteInfo(response.data);
+            console.log(response);
 
-        server
-          .get(`/meet/participate?meetId=${meetId}`)
-          .then((response) => setParticipationInfo(response.data))
+            server
+            .get(`/meet/participate?meetId=${meetId}`)
+            .then((response) => setParticipationInfo(response.data))
+            .catch(console.error);
+          })
           .catch(console.error);
-      }
-    };
-
-    fetchMeetDetail();
-    fetchVoteInfo();
-  }, [meetId, navigate]);
+        })
+        .catch(console.error);
+    }
+  };
 
   useEffect(() => {
-    if (meetInfo && placeVoteInfo && scheduleVoteInfo && participationInfo) {
+    if (!placeVoteInfo || !scheduleVoteInfo || !participationInfo) {
+      fetchVoteInfo();
+    }
+  }, []);
+
+  useEffect(() => {
+    
+    if (placeVoteInfo && scheduleVoteInfo && participationInfo) {
+      console.log(placeVoteInfo, scheduleVoteInfo, participationInfo)
       const now = new Date();
       const placeVoteEndDate = placeVoteInfo?.endDate ? new Date(placeVoteInfo.endDate) : null;
       const scheduleVoteEndDate = scheduleVoteInfo?.endDate ? new Date(scheduleVoteInfo.endDate) : null;
       const participationEndDate = participationInfo?.endDate ? new Date(participationInfo.endDate) : null;
-
+      
       if ((placeVoteEndDate && now < placeVoteEndDate) || (scheduleVoteEndDate && now < scheduleVoteEndDate)) {
-        navigate(`/meet/vote/${meetInfo.id}`);
+        navigate(`/meet/vote/${meetId}`);
+        return;
       } else if (participationEndDate && now < participationEndDate) {
-        navigate(`/meet/join/${meetInfo.id}`);
+        navigate(`/meet/join/${meetId}`);
+        return;
+      }
+      else{
+        fetchMeetDetail();
       }
     }
-  }, [meetInfo, placeVoteInfo, scheduleVoteInfo, participationInfo]);
-
+  }, [placeVoteInfo, scheduleVoteInfo, participationInfo]);
 
   const handleEdit = () => {
     if (meetInfo) {
@@ -126,16 +140,11 @@ const MeetDetail: React.FC = () => {
         });
     }
   };
-
-  if (!meetInfo) {
-    return <div className="text-center py-8">meetDetail 로딩 중...</div>;
+  
+  if(meetInfo == null){
+    return;
   }
 
-  // date.value를 Date 객체로 변환
-  const meetingDate = meetInfo.date?.value ? new Date(meetInfo.date.value) : null;
-  const formattedDate = meetingDate
-    ? `${meetingDate.getFullYear()}-${('0' + (meetingDate.getMonth() + 1)).slice(-2)}-${('0' + meetingDate.getDate()).slice(-2)}`
-    : "날짜 미정";
 
   return (
     <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
@@ -153,10 +162,10 @@ const MeetDetail: React.FC = () => {
           <p className="text-sm text-[#8E8E93]">내용</p>
           <p className="text-lg font-bold">{meetInfo.content ? meetInfo.content : "내용 없음"}</p>
           <p className="text-sm text-[#8E8E93]">참여자</p>
-          <p className="text-lg font-bold">{meetInfo.participants.length > 0 ? meetInfo.participants.join(", ") : " 참여자 없음"}</p>
+          <p className="text-lg font-bold">{meetInfo.participants!.length > 0 ? meetInfo!.participants.join(", ") : " 참여자 없음"}</p>
         </div>
 
-        {meetInfo.isAuthor === "true" && (
+        {meetInfo!.isAuthor === "true" && (
           <div className="flex w-full mt-4">
             <button
               onClick={handleEdit}

@@ -7,17 +7,12 @@ import vote from '../assets/img/vote.png';
 import FooterNav from "../components/FooterNav";
 import { server } from "@/utils/axios";
 import { voteItem } from "@/types/JoinVote";
+import { ParticipationInfo } from "@/types/participationInfo";
 
 const JoinVotePage = () => {
   const navigate = useNavigate();
   const {meetId} = useParams();
-  const [meet, setMeet] = useState({
-    meetTitle: "",
-    endDate: "",
-    date: "",
-    place: "", 
-    isAuthor: ""
-  });
+  const [meet, setMeet] = useState<ParticipationInfo>();
   const [itemList, setItemList] = useState<voteItem[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
   const [votedItem, setVotedItem] = useState<string>(""); //투표 여부 상태 저장을 위한
@@ -158,7 +153,7 @@ const JoinVotePage = () => {
           <h1 className="text-2xl font-bold pl-4">모임 정보</h1>
 
            {/* isAuthor가 true일 때만 수정, 삭제 버튼 표시 */}
-           {meet.isAuthor && (
+           {meet?.isAuthor && (
               <div className="flex space-x-2 mt-1">
                 <button
                   onClick={handleEdit} 
@@ -181,16 +176,16 @@ const JoinVotePage = () => {
         <img src={alarm} alt="확성기 이미지" className="w-16 h-16 mr-4" />
         {/* 텍스트 부분 */}
         <div className="flex flex-col space-y-2">
-          <p className="text-lg font-bold text-left">{meet.meetTitle}</p>
-          <p className="text-lg font-bold text-left">{meet.date}</p>
-          <p className="text-lg font-bold text-left">{meet.place}</p>
+          <p className="text-lg font-bold text-left">{meet?.meetTitle}</p>
+          <p className="text-lg font-bold text-left">{meet?.date}</p>
+          <p className="text-lg font-bold text-left">{meet?.place}</p>
         </div>
         </div>
         {/* 두 번째 블록 */}
         <div className="mt-5 w-full bg-[#E5E5EA] p-6 rounded-[24px] flex items-center">
           <div className="flex flex-col space-y-2 flex-grow pr-4">
             <h2 className="text-2xl font-bold text-left">모임에<br/>참여하시겠습니까?</h2>
-            <p className="text-sm text-left text-[#8E8E93]">투표 마감: {meet.endDate}</p>
+            <p className="text-sm text-left text-[#8E8E93]">투표 마감: {meet?.endDate}</p>
           </div>
           <img src={vote} alt="확성기 이미지" className="w-16 h-16 ml-4" />
         </div>

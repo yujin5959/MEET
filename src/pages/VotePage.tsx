@@ -8,12 +8,7 @@ import { server } from "@/utils/axios";
 import { Schedule } from "@/types/ScheduleVote";
 import { Place } from "@/types/PlaceVote";
 import FooterNav from "../components/FooterNav";
-
-type Meet = {
-  meetTitle: string;
-  endDate: string;
-  isAuthor: string;
-};
+import { Meet } from "@/types/Meet";
 
 const VotePage = () => {
   const navigate = useNavigate();
