@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState  } from "react";
 import { Schedule } from "@/types/ScheduleVote";
+import VotedMemberList from "./popUp/VotedMemberList";
 
 type ScheduleVoteAfterProps = {
   scheduleList: Schedule[],
@@ -7,13 +8,28 @@ type ScheduleVoteAfterProps = {
   fetchScheduleVoteItems: () => void;
 };
 
+
 const ScheduleVoteAfter = ({
   scheduleList,
   fetchScheduleVoteItems  
 }: ScheduleVoteAfterProps) => {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
+
   useEffect(() => {
     fetchScheduleVoteItems(); 
   }, []);
+
+  // 팝업 열기/닫기 토글 함수, 스케줄을 설정
+  const openPopupWithSchedule = (schedule: Schedule) => {
+    setSelectedSchedule(schedule);  // 선택된 스케줄을 상태에 저장
+    setIsPopupOpen(true);  // 팝업 열기
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedSchedule(null);  // 팝업을 닫을 때 스케줄 초기화
+  };
 
   var mostVotedScheduleIds: string[] = [];
 
@@ -48,10 +64,15 @@ const ScheduleVoteAfter = ({
             )}
             <span>{`${schedule.date} ${schedule.time}`}</span>
           </div>
-          <span className="text-[#8E8E93] text-[13px]">{schedule.memberList.length}명</span>
+          <span className="text-[#8E8E93] text-[13px]" onClick={() => openPopupWithSchedule(schedule)}>{schedule.memberList.length}명</span>
         </div>
       ))}
       </div>
+
+      {/* 팝업 열림 상태라면 멤버 리스트 보여주기 */}
+      {isPopupOpen && selectedSchedule && (
+        <VotedMemberList selectedItem={selectedSchedule} closePopup={closePopup} />
+      )}
     </div>
   );
 };

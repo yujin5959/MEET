@@ -105,7 +105,7 @@ const MeetEdit: React.FC = () => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-2 block w-full text-[18px] font-bold bg-transparent"
+            className="pl-2 mt-2 block w-full text-[18px] font-bold bg-transparent"
           />
           </div>
 
@@ -129,7 +129,7 @@ const MeetEdit: React.FC = () => {
             type="text"
             value={place}
             onChange={(e) => setPlace(e.target.value)}
-            className="mt-2 block w-full text-[18px] font-bold bg-transparent"
+            className="pl-2 mt-2 block w-full text-[18px] font-bold bg-transparent"
           />
           </div>
 
@@ -140,7 +140,7 @@ const MeetEdit: React.FC = () => {
             type="text"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="mt-2 block w-full text-[18px] font-bold bg-transparent"
+            className="mt-2 pl-2 block w-full text-[18px] font-bold bg-transparent"
           />
           </div>
         </form>

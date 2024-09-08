@@ -16,6 +16,7 @@ const JoinVotePage = () => {
     endDate: "",
     date: "",
     place: "", 
+    isAuthor: ""
   });
   const [itemList, setItemList] = useState<voteItem[]>([]);
   const [isVoted, setIsVoted] = useState<boolean>(false);
@@ -72,7 +73,7 @@ const JoinVotePage = () => {
       .then((response) => {
         const data = response.data;
 
-        const meetDateString = data.date || "정보 없음";
+        const meetDateString = data.date || "날짜 미정";
         const formattedMeetDate = formatDate(meetDateString);
 
         const endDateString = data.endDate || "정보 없음";
@@ -83,6 +84,7 @@ const JoinVotePage = () => {
           date: formattedMeetDate,
           endDate: formattedEndDate,
           place: data.place || "장소 미정",
+          isAuthor: data.isAuthor
         });
       })
       .catch((error) => {
@@ -114,7 +116,7 @@ const JoinVotePage = () => {
     const date = new Date(formattedString);
 
     if (isNaN(date.getTime())) {
-      return "정보 없음";
+      return "날짜 미정";
     }
 
     return date.toLocaleString("ko-KR", {
@@ -125,11 +127,54 @@ const JoinVotePage = () => {
       minute: '2-digit',
     });
   };;
+
+  // 수정 버튼 클릭 이벤트 함수
+  const handleEdit = () => {
+    navigate(`/meet/edit/${meetId}`); 
+  };
+
+  // 삭제 버튼 클릭 이벤트 함수
+  const handleDelete = () => {
+    if (meetId) {
+      server
+        .delete(`/meet?meetId=${meetId}`)
+        .then(() => {
+          navigate('/');
+        })
+        .catch((error) => {
+          if (error.code === "403") {
+            navigate("/Unauthorized");
+          } else if (error.code === "404") {
+            navigate("/not-found");
+          }
+        });
+    }
+  };
   
   return (
-    <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
+    <div className="overflow-y-auto w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" , paddingBottom: "90px" }}>
       <div className="flex flex-col items-start m-6">
-        <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
+        <div className="flex justify-around item-center w-full mb-4">
+          <h1 className="text-2xl font-bold pl-4">모임 정보</h1>
+
+           {/* isAuthor가 true일 때만 수정, 삭제 버튼 표시 */}
+           {meet.isAuthor && (
+              <div className="flex space-x-2 mt-1">
+                <button
+                  onClick={handleEdit} 
+                  className="w-16 px-4 py-2 bg-[#FFE607] rounded-[24px] text-black text-sm font-bold"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={handleDelete} 
+                  className="w-16 px-4 py-2 bg-[#FF3B30] rounded-[24px] text-black text-sm font-bold"
+                >
+                  삭제
+                </button>
+              </div>
+            )}
+        </div>
 
         <div className="w-full bg-white p-6 rounded-[24px] space-y-2 flex items-center">
         

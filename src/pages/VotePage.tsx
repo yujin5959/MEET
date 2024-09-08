@@ -12,12 +12,13 @@ import FooterNav from "../components/FooterNav";
 type Meet = {
   meetTitle: string;
   endDate: string;
+  isAuthor: string;
 };
 
 const VotePage = () => {
   const navigate = useNavigate();
   const {meetId} = useParams();
-  const [meet, setMeet] = useState<Meet>({ meetTitle: '', endDate: '' });
+  const [meet, setMeet] = useState<Meet>({ meetTitle: '', endDate: '', isAuthor: '' });
   const [scheduleList, setScheduleList] = useState<Schedule[]>([]);
   const [placeList, setPlaceList] = useState<Place[]>([]);
   const [isScheduleVoted, setIsScheduleVoted] = useState<boolean>(false);
@@ -51,6 +52,7 @@ const VotePage = () => {
         setMeet({
           meetTitle: scheduleResponse.data.meetTitle,
           endDate: placeResponse.data.endDate,
+          isAuthor: placeResponse.data.isAuthor
         });
       })
       .catch((error) => {
@@ -178,6 +180,29 @@ const VotePage = () => {
     setSelectedPlaceIds(placeIds);
   };
 
+  // 수정 버튼 클릭 이벤트 함수
+  const handleEdit = () => {
+    navigate(`/meet/edit/${meetId}`); 
+  };
+
+  // 삭제 버튼 클릭 이벤트 함수
+  const handleDelete = () => {
+    if (meetId) {
+      server
+        .delete(`/meet?meetId=${meetId}`)
+        .then(() => {
+          navigate('/');
+        })
+        .catch((error) => {
+          if (error.code === "403") {
+            navigate("/Unauthorized");
+          } else if (error.code === "404") {
+            navigate("/not-found");
+          }
+        });
+    }
+  };
+
   return (
     <div
       className="w-full flex flex-col overflow-y-auto"
@@ -188,9 +213,31 @@ const VotePage = () => {
         <h1 className="text-2xl font-bold">
           {meet.meetTitle}
         </h1>
-        <span className="text-[13px] text-[#8E8E93] mt-1">
-          투표 마감: {meet.endDate}
-        </span>
+
+        <div className="flex items-center justify-between w-full">
+          <span className="text-[13px] text-left text-[#8E8E93] w-1/2">
+            투표 마감: {meet.endDate}
+          </span>
+
+          {/* isAuthor가 true일 때만 수정, 삭제 버튼 표시 */}
+          {meet.isAuthor && (
+            <div className="flex space-x-2 mt-1">
+              <button
+                onClick={handleEdit} 
+                className="w-16 px-4 py-2 bg-[#FFE607] rounded-[24px] text-black text-sm font-bold"
+              >
+                수정
+              </button>
+              <button
+                onClick={handleDelete} 
+                className="w-16 px-4 py-2 bg-[#FF3B30] rounded-[24px] text-black text-sm font-bold"
+              >
+                삭제
+              </button>
+            </div>
+          )}
+        </div>
+        
       </div>
   
       {/* 일정 투표 섹션 */}
