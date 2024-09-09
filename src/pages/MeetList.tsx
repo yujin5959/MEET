@@ -22,7 +22,8 @@ const MeetList: React.FC = () => {
         .then((response) => {
           setMeetList(response.data);
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error(error)
           navigate("/not-found");
         });
     };

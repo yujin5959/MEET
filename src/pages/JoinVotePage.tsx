@@ -77,6 +77,7 @@ const JoinVotePage = () => {
         setMeet({
           meetTitle: data.meetTitle || "제목 없음",
           date: formattedMeetDate,
+          time: data.time,
           endDate: formattedEndDate,
           place: data.place || "장소 미정",
           isAuthor: data.isAuthor
@@ -118,8 +119,6 @@ const JoinVotePage = () => {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   };;
 
@@ -176,9 +175,9 @@ const JoinVotePage = () => {
         <img src={alarm} alt="확성기 이미지" className="w-16 h-16 mr-4" />
         {/* 텍스트 부분 */}
         <div className="flex flex-col space-y-2">
-          <p className="text-lg font-bold text-left">{meet?.meetTitle}</p>
-          <p className="text-lg font-bold text-left">{meet?.date}</p>
-          <p className="text-lg font-bold text-left">{meet?.place}</p>
+          <p className="text-md font-bold text-left">{meet?.meetTitle}</p>
+          <p className="text-md font-bold text-left">{meet?.date} {meet?.time}</p>
+          <p className="text-md font-bold text-left">{meet?.place}</p>
         </div>
         </div>
         {/* 두 번째 블록 */}
