@@ -102,8 +102,23 @@ const MeetDetail: React.FC = () => {
       console.log(placeVoteInfo, scheduleVoteInfo, participationInfo)
       const now = new Date();
       const placeVoteEndDate = placeVoteInfo?.endDate ? new Date(placeVoteInfo.endDate) : null;
+      if (placeVoteEndDate) {
+        // 시간을 00:00으로 설정
+        placeVoteEndDate.setHours(0);
+        placeVoteEndDate.setMinutes(0);
+      }
       const scheduleVoteEndDate = scheduleVoteInfo?.endDate ? new Date(scheduleVoteInfo.endDate) : null;
+      if (scheduleVoteEndDate) {
+        // 시간을 00:00으로 설정
+        scheduleVoteEndDate.setHours(0);
+        scheduleVoteEndDate.setMinutes(0);
+      }
       const participationEndDate = participationInfo?.endDate ? new Date(participationInfo.endDate) : null;
+      if (participationEndDate) {
+        // 시간을 00:00으로 설정
+        participationEndDate.setHours(0);
+        participationEndDate.setMinutes(0);
+      }
       
       if ((placeVoteEndDate && now < placeVoteEndDate) || (scheduleVoteEndDate && now < scheduleVoteEndDate)) {
         navigate(`/meet/vote/${meetId}`);
@@ -148,8 +163,8 @@ const MeetDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col" style={{ backgroundColor: "#F2F2F7" }}>
-      <div className="flex flex-col items-start m-8 space-y-4">
-        <h1 className="text-2xl font-bold pl-4 mb-4">모임 정보</h1>
+      <div className="flex flex-col items-start m-8 pb-16 space-y-4">
+        <h1 className="text-2xl font-bold pl-4">모임 정보</h1>
         <div className="w-full bg-white p-6 rounded-[24px] space-y-2 text-left">
           <p className="text-sm text-[#8E8E93]">제목</p>
           <p className="text-lg font-bold">{meetInfo.title}</p>
@@ -161,7 +176,7 @@ const MeetDetail: React.FC = () => {
           <p className="text-lg font-bold">{meetInfo.place?.value ? meetInfo.place.value : "장소 미정"}</p>
           <p className="text-sm text-[#8E8E93]">내용</p>
           <p className="text-lg font-bold">{meetInfo.content ? meetInfo.content : "내용 없음"}</p>
-          <p className="text-sm text-[#8E8E93]">참여자</p>
+          <p className="text-xs text-[#8E8E93]">참여자</p>
           <p className="text-lg font-bold">{meetInfo.participants!.length > 0 ? meetInfo!.participants.join(", ") : " 참여자 없음"}</p>
         </div>
 
