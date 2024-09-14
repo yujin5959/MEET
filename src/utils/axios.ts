@@ -3,8 +3,7 @@ import axios from "axios";
 import ServerError from "@/types/serverError";
 
 const api = axios.create({
-
-  baseURL: "http://43.203.36.37/api",
+  baseURL: import.meta.env.VITE_BASE_URL,
 });
 
 const whiteList = ["/auth/login","/auth/token/refresh"]
