@@ -3,12 +3,10 @@ import axios from "axios";
 import ServerError from "@/types/serverError";
 
 const api = axios.create({
+  baseURL: import.meta.env.VITE_SERVER_URL,
 
-  baseURL: "http://43.203.36.37/api",
 });
-
 const whiteList = ["/auth/login","/auth/token/refresh"]
-
 // 요청 인터셉터
 api.interceptors.request.use(
   function (config) {
